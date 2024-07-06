@@ -1,7 +1,10 @@
 import { Injectable } from '@nestjs/common';
+import { InjectModel } from '@nestjs/mongoose'
+import { Model } from 'mongoose'
 
 @Injectable()
 export class MemberService {
+	constructor(@InjectModel('Member') private readonly memberModel: Model<null>) {}
 	public async signup(): Promise<string> {
 		return 'SignUp, Exucuted'
 	}
@@ -13,7 +16,7 @@ export class MemberService {
 		return 'updateMember executed';
 	}
 
-	public async getMethod(): Promise<string> {
-		return 'getMethod executed';
+	public async getMember(): Promise<string> {
+		return 'getMember executed';
 	}
 }

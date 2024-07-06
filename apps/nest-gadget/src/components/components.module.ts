@@ -11,8 +11,8 @@ import { ViewModule } from './view/view.module';
 @Module({
 	imports: [
 		MemberModule,
-		GadgetModule,
 		AuthModule,
+		GadgetModule,
 		BoardArticleModule,
 		CommentModule,
 		FollowModule,

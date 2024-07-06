@@ -12,19 +12,19 @@ export class MemberResolver {
 	}
 	@Mutation(() => String)
 	public async login(): Promise<string> {
-		console.log('Mutation: log-in');
+		console.log('Mutation: Log-in');
 		return await this.memberService.login();
 	}
 
 	@Mutation(() => String)
 	public async updateMember(): Promise<string> {
-		console.log('Mutation: update-Member');
+		console.log('Mutation: Update-Member');
 		return await this.memberService.updateMember();
 	}
 
 	@Query(() => String)
-	public async getMethod(): Promise<string> {
-		console.log('Mutation:getMethod');
-		return await this.memberService.getMethod();
+	public async getMember(): Promise<string> {
+		console.log('Query: GetMember');
+		return await this.memberService.getMember();
 	}
 }
