@@ -5,6 +5,7 @@ import { Member } from '../../libs/dto/member/member';
 import { LoginInput, MemberInput } from '../../libs/dto/member/member.input';
 import { Message } from '../../libs/enums/common.enums';
 import { MemberStatus } from '../../libs/enums/member.enum';
+import { TypeDefsDecoratorFactory } from '@nestjs/graphql/dist/federation/type-defs-decorator.factory'
 
 @Injectable()
 export class MemberService {
@@ -17,14 +18,17 @@ export class MemberService {
 			return result;
 		} catch (error) {
 			console.log(error);
-			throw new BadRequestException(error);
+			throw new BadRequestException(Message.CREATE_FAILED);
 		}
 	}
 
 	public async login(input: LoginInput): Promise<Member> {
 		const { memberNick, memberPassword } = input;
-		const response:Member = await this.memberModel.findOne({ memberNick: memberNick }).select('+memberPassword').exec();
-console.log(response)
+		const response: Member = await this.memberModel
+			.findOne({ memberNick: memberNick })
+			.select('+memberPassword')
+			.exec();
+		console.log(response);
 		if (!response || response.memberStatus === MemberStatus.DELETE) {
 			throw new InternalServerErrorException(Message.NO_MEMBER_NICK);
 		} else if (response.memberStatus === MemberStatus.BLOCK) {

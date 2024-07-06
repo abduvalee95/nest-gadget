@@ -19,7 +19,7 @@ export class LoggingInterceptor implements NestInterceptor {
 			this.logger.log(`${this.stringify(gqlContext.getContext().req.body)}`, 'REQUEST');
 
 			//*  (2) Error handling
-
+			// developed
 			//*  (3) No Errors, Giving Response Bellow
 
 			return next.handle().pipe(
