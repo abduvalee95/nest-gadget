@@ -30,7 +30,7 @@ registerEnumType(MemberAuthType, {
 	name: 'MemberAuthType',
 });
 
-//! bu Ozi common.enum.ts  /da yozilgan
+
 export enum Direction {
 	ASC = 1,
 	DESC = -1,
