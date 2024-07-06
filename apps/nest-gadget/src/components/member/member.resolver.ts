@@ -18,11 +18,15 @@ export class MemberResolver {
 			console.log(error);
 		}
 	}
-	@Mutation(() => String)
+	@Mutation(() => Member)
 	@UsePipes(ValidationPipe)
-	public async login(@Args('input') input: LoginInput): Promise<string> {
-		console.log('Mutation: Log-in');
-		return await this.memberService.login();
+	public async login(@Args('input') input: LoginInput): Promise<Member> {
+		try {
+			console.log('Mutation: Log-in');
+			return await this.memberService.login(input);
+		} catch (error) {
+			console.log(error);
+		}
 	}
 
 	@Mutation(() => String)
