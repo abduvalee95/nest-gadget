@@ -1,11 +1,13 @@
 import { BadRequestException, Injectable, InternalServerErrorException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
+import { Model, ObjectId } from 'mongoose';
 import { Member } from '../../libs/dto/member/member';
 import { LoginInput, MemberInput } from '../../libs/dto/member/member.input';
 import { Message } from '../../libs/enums/common.enums';
 import { MemberStatus } from '../../libs/enums/member.enum';
 import { AuthService } from '../auth/auth.service'
+import { T } from '../../libs/types/common'
+import { MemberUpdate } from '../../libs/dto/member/member.update'
 
 @Injectable()
 export class MemberService {
@@ -46,11 +48,55 @@ export class MemberService {
 		return response;
 	}
 
-	public async updateMember(): Promise<string> {
-		return 'updateMember executed';
+
+	//* 														UpdateMember
+
+	public async updateMember(memberId: ObjectId, input: MemberUpdate): Promise<Member> {
+		const result: Member = await this.memberModel
+			.findOneAndUpdate(
+				{
+					_id: memberId,
+					memberStatus: MemberStatus.ACTIVE,
+				},
+				input,
+				{ new: true },
+			)
+			.exec();
+		if (!result) throw new InternalServerErrorException(Message.UPDATE_FALED);
+
+		result.accessToken = await this.authService.createToken(result); // accessTokendi yangilamasak Frontendda u ozgarishsiz qoladi
+		return result;
 	}
 
-	public async getMember(): Promise<string> {
-		return 'getMember executed';
+	//* 														getMember
+	
+	public async getMember(memberId: ObjectId, targetId: ObjectId): Promise<Member> {
+		const search: T = {
+			_id: targetId,
+			memberStatus: {
+				$in: [MemberStatus.ACTIVE, MemberStatus.BLOCK],
+			},
+		};
+		const targetMember = await this.memberModel.findOne(search).lean().exec();
+		if (!targetMember) throw new InternalServerErrorException(Message.NO_DATA_FOUND);
+
+		// Bu Erda agar Murojatchini Id si "login-bolgan" bolsa biz View ni 1 ga oshiramiz aks holdas oshirmimiz
+		if (memberId) {
+		/* 	//		kim tomosha qilyabti, mimani tomosha q-ti,
+			const viewInput: ViewInput = { memberId: memberId, viewRefId: targetId, viewGroup: ViewGroup.MEMBER };
+			const newView = await this.viewService.recordView(viewInput); // agar  record ishga tushub yangi View ni +1 oshiradi
+			if (newView) {
+				await this.memberModel.findOneAndUpdate(search, { $inc: { memberViews: 1 } }, { new: true }).exec();
+				targetMember.memberViews++;
+			}
+			//* meLiked
+			const likeInput = { memberId: memberId, likeRefId: targetId, likeGroup: LikeGroup.MEMBER };
+			targetMember.meLiked = await this.likeService.checkLikeExistance(likeInput);
+
+			//* meFolloweed
+			targetMember.meFollowed = await this.checkSubscription(memberId, targetId);*/
+		}
+
+		return targetMember;
 	}
 }
