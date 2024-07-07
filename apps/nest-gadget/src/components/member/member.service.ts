@@ -15,6 +15,7 @@ export class MemberService {
 
 		try {
 			const result = await this.memberModel.create(input);
+			result.accessToken = await this.authService.createToken(result);
 			return result;
 		} catch (error) {
 			console.log(error);
@@ -24,11 +25,13 @@ export class MemberService {
 	}
 
 	public async login(input: LoginInput): Promise<Member> {
+
 		const { memberNick, memberPassword } = input;
 		const response: Member = await this.memberModel
 			.findOne({ memberNick: memberNick })
 			.select('+memberPassword')
 			.exec();
+
 		if (!response || response.memberStatus === MemberStatus.DELETE) {
 			throw new InternalServerErrorException(Message.NO_MEMBER_NICK);
 		} else if (response.memberStatus === MemberStatus.BLOCK) {
@@ -38,7 +41,8 @@ export class MemberService {
 		//todo Compare Paswords with bycrypt
 		const isMatch = await this.authService.comparePassword(input.memberPassword,response.memberPassword)
 		if (!isMatch) throw new InternalServerErrorException(Message.WRONG_PASSWORD)
-			
+
+			response.accessToken = await this.authService.createToken(response)
 		return response;
 	}
 
