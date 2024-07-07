@@ -22,7 +22,6 @@ export class MemberResolver {
 	public async signup(@Args('input') input: MemberInput): Promise<Member> {
 			console.log('SignUp:>>');
 			return await this.memberService.signup(input);
-
 	}
 
 	@Mutation(() => Member)
@@ -34,7 +33,7 @@ export class MemberResolver {
 
 	//* 														CheckAuth
 
-	@UseGuards(AuthGuard) //* Authenticaztion tekshiriladi
+	@UseGuards(AuthGuard) 
 	@Query(() => String)
 	public async checkAuth(@AuthMember('memberNick') memberNick: string): Promise<string> {
 		console.log('Query: checkAuth');
@@ -42,6 +41,7 @@ export class MemberResolver {
 		console.log(memberNick);
 		return `Hello ${memberNick},`;
 	}
+
 	//* 														checkAuthRoles
 
 	@Roles(MemberType.SELLER, MemberType.USER)
@@ -62,7 +62,7 @@ export class MemberResolver {
 		@AuthMember('_id') memberId: ObjectId,
 	): Promise<Member> {
 		console.log('Mutation: Update-Member');
-		delete input._id; // id kerak bolmaydi idni Memberid dan qabul qilyabmiz
+		delete input._id; 
 		return await this.memberService.updateMember(memberId, input);
 	}
 
@@ -71,7 +71,7 @@ export class MemberResolver {
 	@UseGuards(WithoutGuard)
 	@Query(() => Member)
 	public async getMember(
-		@Args('memberId') input: string, //
+		@Args('memberId') input: string, 
 		@AuthMember('_id') memberId: ObjectId,
 	): Promise<Member> {
 		console.log('Query: getMember');

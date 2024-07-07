@@ -1,5 +1,3 @@
-//! dto -- Data Transfer Object
-
 import { Field, InputType } from '@nestjs/graphql';
 import { IsNotEmpty, IsOptional, Length } from 'class-validator';
 import { MemberAuthType, MemberStatus, MemberType } from '../../enums/member.enum';
@@ -52,5 +50,5 @@ export class MemberUpdate {
 	@Field(() => String, { nullable: true })
 	memberDesc?: string;
 
-	deletedAt?: Date; // bu delete vaqtni kiritib olishimiz uchuin 
+	deletedAt?: Date;
 }
