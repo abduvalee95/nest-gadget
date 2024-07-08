@@ -3,17 +3,26 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Model, ObjectId } from 'mongoose';
 import { Member } from '../../libs/dto/member/member';
 import { LoginInput, MemberInput } from '../../libs/dto/member/member.input';
+import { MemberUpdate } from '../../libs/dto/member/member.update';
 import { Message } from '../../libs/enums/common.enums';
 import { MemberStatus } from '../../libs/enums/member.enum';
-import { AuthService } from '../auth/auth.service'
-import { T } from '../../libs/types/common'
-import { MemberUpdate } from '../../libs/dto/member/member.update'
+import { T } from '../../libs/types/common';
+import { AuthService } from '../auth/auth.service';
+import { ViewService } from '../view/view.service';
+import { ViewGroup } from '../../libs/enums/view.enum'
+import { ViewInput } from '../../libs/dto/view/view.input'
 
 @Injectable()
 export class MemberService {
-	constructor(@InjectModel('Member') private readonly memberModel: Model<Member>, private readonly authService: AuthService) {}
+	constructor(
+		@InjectModel('Member')
+		private readonly memberModel: Model<Member>,
+		private readonly authService: AuthService,
+		private readonly viewService: ViewService,
+	) {}
+
 	public async signup(input: MemberInput): Promise<Member> {
-		input.memberPassword = await this.authService.hashPassword(input.memberPassword)
+		input.memberPassword = await this.authService.hashPassword(input.memberPassword);
 
 		try {
 			const result = await this.memberModel.create(input);
@@ -23,11 +32,9 @@ export class MemberService {
 			console.log(error);
 			throw new BadRequestException(Message.CREATE_FAILED);
 		}
-		
 	}
 
 	public async login(input: LoginInput): Promise<Member> {
-
 		const { memberNick, memberPassword } = input;
 		const response: Member = await this.memberModel
 			.findOne({ memberNick: memberNick })
@@ -41,13 +48,12 @@ export class MemberService {
 		}
 
 		//todo Compare Paswords with bycrypt
-		const isMatch = await this.authService.comparePassword(input.memberPassword,response.memberPassword)
-		if (!isMatch) throw new InternalServerErrorException(Message.WRONG_PASSWORD)
+		const isMatch = await this.authService.comparePassword(input.memberPassword, response.memberPassword);
+		if (!isMatch) throw new InternalServerErrorException(Message.WRONG_PASSWORD);
 
-			response.accessToken = await this.authService.createToken(response)
+		response.accessToken = await this.authService.createToken(response);
 		return response;
 	}
-
 
 	//* 														UpdateMember
 
@@ -69,7 +75,7 @@ export class MemberService {
 	}
 
 	//* 														getMember
-	
+
 	public async getMember(memberId: ObjectId, targetId: ObjectId): Promise<Member> {
 		const search: T = {
 			_id: targetId,
@@ -82,13 +88,14 @@ export class MemberService {
 
 		// Bu Erda agar Murojatchini Id si "login-bolgan" bolsa biz View ni 1 ga oshiramiz aks holdas oshirmimiz
 		if (memberId) {
-		/* 	//		kim tomosha qilyabti, mimani tomosha q-ti,
+				//		kim tomosha qilyabti, mimani tomosha q-ti,
 			const viewInput: ViewInput = { memberId: memberId, viewRefId: targetId, viewGroup: ViewGroup.MEMBER };
 			const newView = await this.viewService.recordView(viewInput); // agar  record ishga tushub yangi View ni +1 oshiradi
 			if (newView) {
 				await this.memberModel.findOneAndUpdate(search, { $inc: { memberViews: 1 } }, { new: true }).exec();
 				targetMember.memberViews++;
 			}
+			/*
 			//* meLiked
 			const likeInput = { memberId: memberId, likeRefId: targetId, likeGroup: LikeGroup.MEMBER };
 			targetMember.meLiked = await this.likeService.checkLikeExistance(likeInput);

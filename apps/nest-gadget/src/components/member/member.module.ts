@@ -4,6 +4,7 @@ import MemberSchema from '../../schemas/Member.model';
 import { MemberResolver } from './member.resolver';
 import { MemberService } from './member.service';
 import { AuthModule } from '../auth/auth.module'
+import { ViewModule } from '../view/view.module'
 
 @Module({
 	imports: [
@@ -14,6 +15,7 @@ import { AuthModule } from '../auth/auth.module'
 			},
 		]),
 		AuthModule,
+		ViewModule,
 	],
 	providers: [MemberService, MemberResolver],
 })
