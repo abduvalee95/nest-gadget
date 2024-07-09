@@ -1,7 +1,7 @@
 import { UseGuards, UsePipes, ValidationPipe } from '@nestjs/common';
 import { Args, Mutation, Query, Resolver } from '@nestjs/graphql';
 import { Member, Members } from '../../libs/dto/member/member';
-import { LoginInput, MemberInput, MembersInquiry } from '../../libs/dto/member/member.input';
+import { AgentsInquiry, LoginInput, MemberInput, MembersInquiry } from '../../libs/dto/member/member.input';
 import { MemberService } from './member.service';
 import { AuthGuard } from '../auth/guards/auth.guard'
 import { MemberUpdate } from '../../libs/dto/member/member.update'
@@ -79,9 +79,22 @@ export class MemberResolver {
 		return await this.memberService.getMember(memberId, targetId);
 	}
 
-	/* // ***************************** 
-	!																					ADMIN  
-	* ******************************** */
+	//* 														GetAgents
+
+	@UseGuards(WithoutGuard)
+	@Query(() => Members) // querybni hoizil qilyabmiz u
+	public async getAgents(
+		@Args('input') input: AgentsInquiry, //
+		@AuthMember('_id') memberId: ObjectId,
+	): Promise<Members> {
+		console.log('Query: GetAgents');
+		return await this.memberService.getAgents(memberId, input);
+	}
+
+
+	/* // *******************************************************************
+	!																			ADMIN  
+	* ***********************************************************************/
 
 	@Roles(MemberType.ADMIN)
 	@UseGuards(RolesGuard)
