@@ -1,16 +1,16 @@
 import { BadRequestException, Injectable, InternalServerErrorException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { Model, ObjectId, Schema } from 'mongoose';
+import { Model, ObjectId } from 'mongoose';
 import { Member, Members } from '../../libs/dto/member/member';
 import { AgentsInquiry, LoginInput, MemberInput, MembersInquiry } from '../../libs/dto/member/member.input';
 import { MemberUpdate } from '../../libs/dto/member/member.update';
+import { ViewInput } from '../../libs/dto/view/view.input';
 import { Message } from '../../libs/enums/common.enums';
 import { Direction, MemberStatus, MemberType } from '../../libs/enums/member.enum';
+import { ViewGroup } from '../../libs/enums/view.enum';
 import { T } from '../../libs/types/common';
 import { AuthService } from '../auth/auth.service';
 import { ViewService } from '../view/view.service';
-import { ViewGroup } from '../../libs/enums/view.enum'
-import { ViewInput } from '../../libs/dto/view/view.input'
 
 @Injectable()
 export class MemberService {
@@ -88,7 +88,7 @@ export class MemberService {
 
 		// Bu Erda agar Murojatchini Id si "login-bolgan" bolsa biz View ni 1 ga oshiramiz aks holdas oshirmimiz
 		if (memberId) {
-				//		kim tomosha qilyabti, mimani tomosha q-ti,
+			//		kim tomosha qilyabti, mimani tomosha q-ti,
 			const viewInput: ViewInput = { memberId: memberId, viewRefId: targetId, viewGroup: ViewGroup.MEMBER };
 			const newView = await this.viewService.recordView(viewInput); // agar  record ishga tushub yangi View ni +1 oshiradi
 			if (newView) {
@@ -128,7 +128,7 @@ export class MemberService {
 							{ $skip: (input.page - 1) * input.limit },
 							{ $limit: input.limit },
 							//lookupAuthMemberLiked(memberId),
-							],
+						],
 						metaCounter: [{ $count: 'total' }],
 					},
 				},
@@ -137,8 +137,6 @@ export class MemberService {
 		if (!result.length) throw new InternalServerErrorException(Message.NO_DATA_FOUND);
 		return result[0];
 	}
-
-
 
 	/* // *******************************************************************
 	!																			ADMIN  
@@ -171,8 +169,10 @@ export class MemberService {
 		return result[0];
 	}
 
-}
-function lookupAuthMemberLiked(memberId: Schema.Types.ObjectId): import("mongoose").PipelineStage.FacetPipelineStage {
-	throw new Error('Function not implemented.')
-}
+	public async updateMemberByAdmin(input: MemberUpdate): Promise<Member> {
+		const result: Member = await this.memberModel.findOneAndUpdate({ _id: input._id }, input, { new: true }).exec();
+		if (!result) throw new InternalServerErrorException(Message.UPDATE_FALED);
 
+		return result;
+	}
+}
