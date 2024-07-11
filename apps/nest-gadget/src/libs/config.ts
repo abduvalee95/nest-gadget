@@ -8,7 +8,7 @@ export const shapeIntoMongoObjectId = (target: any) => {
 
 //* IMAGE CONFIGURATION
 
-export const validMimeTypes = ['image/png', 'image/jpg', 'image/jpeg'];
+export const validMimeTypes = ['image/png', 'image/jpg', 'image/jpeg', 'image/webp'];
 export const getSerialForImage = (filename: string) => {
 	const ext = path.parse(filename).ext;
 	return uuidv4() + ext;

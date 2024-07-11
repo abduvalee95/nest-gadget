@@ -19,7 +19,7 @@ export class Gadget {
 	gadgetLocation: GadgetLocation;
 
 	@Field(() => String)
-	gadgetAddress: String;
+	gadgetColor: String;
 
 	@Field(() => String)
 	gadgetTitle: string;
@@ -28,13 +28,13 @@ export class Gadget {
 	gadgetPrice: number;
 
 	@Field(() => Number)
-	gadgetSquare: number;
+	gadgetDisplaySquare: number;
 
 	@Field(() => Int)
-	gadgetBeds: number;
+	gadgetWeight: number;
 
 	@Field(() => Int)
-	gadgetRooms: number;
+	gadgetCapacity: number;
 
 	@Field(() => Int)
 	gadgetViews: number;

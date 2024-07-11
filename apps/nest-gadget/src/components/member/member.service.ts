@@ -8,7 +8,7 @@ import { ViewInput } from '../../libs/dto/view/view.input';
 import { Message } from '../../libs/enums/common.enums';
 import { Direction, MemberStatus, MemberType } from '../../libs/enums/member.enum';
 import { ViewGroup } from '../../libs/enums/view.enum';
-import { T } from '../../libs/types/common';
+import { StatisticModifier, T } from '../../libs/types/common';
 import { AuthService } from '../auth/auth.service';
 import { ViewService } from '../view/view.service';
 
@@ -175,4 +175,12 @@ export class MemberService {
 
 		return result;
 	}
+
+		// memberni malumotlarni tashqaridan manipulate qilishimiz kk
+		public async memberStatsEditor(input: StatisticModifier): Promise<Member> {
+			console.log('memberStatsEditor:::');
+	
+			const { _id, targetKey, modifier } = input;
+			return await this.memberModel.findByIdAndUpdate(_id, { $inc: { [targetKey]: modifier } }, { new: true }).exec();
+		}
 }

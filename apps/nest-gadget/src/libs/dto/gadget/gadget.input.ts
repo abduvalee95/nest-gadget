@@ -22,7 +22,7 @@ export class GadgetInput {
 	@IsNotEmpty()
 	@Length(3, 50)
 	@Field(() => String)
-	gadgetAddress: string;
+	gadgetColor: string;
 
 	@IsNotEmpty()
 	@Length(3, 50)
@@ -33,11 +33,11 @@ export class GadgetInput {
 	@Field(() => Number)
 	gadgetPrice: number;
 
-	@IsNotEmpty()
+	@IsOptional()
 	@Field(() => Number)
-	gadgetSize: number;
+	gadgetDisplaySquare: number;
 
-	@IsNotEmpty()
+	@IsOptional()
 	@IsInt()
 	@Min(1)
 	@Field(() => Int)
@@ -117,11 +117,11 @@ class PISearch {
 
 	@IsOptional()
 	@Field(() => [Int], { nullable: true })
-	roomsList?: Number[];
+	gadgetCapacityList?: Number[];
 
 	@IsOptional()
 	@Field(() => [Int], { nullable: true })
-	bedsList?: Number[];
+	gadgetWeight?: Number[];
 
 	@IsOptional()
 	@IsIn(availableOptions, { each: true })
@@ -134,7 +134,7 @@ class PISearch {
 
 	@IsOptional()
 	@Field(() => SquaresRange, { nullable: true })
-	squaresRange?: SquaresRange;
+	gadgetDisplaySquare?: SquaresRange;
 
 	@IsOptional()
 	@Field(() => PeriodsRange, { nullable: true })

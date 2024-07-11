@@ -13,6 +13,7 @@ async function bootstrap() {
 
 	app.enableCors({ origin: true, credentials: true });
 	app.use(graphqlUploadExpress({ maxFileSize: 11500000, maxFile: 10 })); //** miqdori va nechta yuklash kkligni yozdik */
+	
 	app.use('/uploads', express.static('./uploads')); //**Tashqi olamga static folder Sifatida ochib berdik */
 	await app.listen(process.env.PORT_API ?? 3000);
 }

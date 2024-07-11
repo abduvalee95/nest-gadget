@@ -108,7 +108,7 @@ const GadgetSchema = new Schema(
 			type: Date,
 		},
 	},
-	{ timestamps: true, collection: 'properties' },
+	{ timestamps: true, collection: 'gadgets' },
 );
 //*  compound index  shu 4 malumot birdaniga  Unique Bolish kk: xar 4talasi birxil bolgan malumotni  " 1-odam qoshaolmaydi " ruxsat bermasligimiz kk
 GadgetSchema.index({ gadgetType: 1, gadgetLocation: 1, gadgetTitle: 1, gadgetPrice: 1 }, { unique: true });

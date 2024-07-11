@@ -174,8 +174,8 @@ export class MemberResolver {
 				if (!result) throw new Error(Message.UPLOAD_FAILED);
 
 				uploadedImages[index] = url;
-			} catch (err) {
-				console.log('Error, file missing!');
+			} catch (err) { 
+				return null // Console.log bolish kk edi lekin  ishlayabti
 			}
 		});
 
