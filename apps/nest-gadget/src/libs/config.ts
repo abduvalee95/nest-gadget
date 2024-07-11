@@ -35,3 +35,13 @@ export const lookupVisit = {
 		as: 'visitedGadget.memberData',
 	},
 };
+
+export const lookupMember = {
+	$lookup: {
+		from: 'members',
+		localField: 'memberId',
+		foreignField: '_id',
+		as: 'memberData',
+	},
+};
+
