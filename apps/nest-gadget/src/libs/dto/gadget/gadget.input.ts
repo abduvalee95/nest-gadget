@@ -179,7 +179,7 @@ class APISearch {
 }
 
 @InputType()
-export class SellerGadgretsInquiry {
+export class SellerGadgetsInquiry {
 	@IsNotEmpty()
 	@Min(1)
 	@Field(() => Int)

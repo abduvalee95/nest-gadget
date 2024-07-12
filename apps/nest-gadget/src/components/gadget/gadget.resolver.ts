@@ -3,7 +3,7 @@ import { Args, Mutation, Query, Resolver } from '@nestjs/graphql';
 import { ObjectId } from 'mongoose';
 import { shapeIntoMongoObjectId } from '../../libs/config';
 import { Gadget, Gadgets } from '../../libs/dto/gadget/gadget';
-import { GadgetInput, GadgetsInquiry } from '../../libs/dto/gadget/gadget.input';
+import { AllGadgetsInquiry, GadgetInput, GadgetsInquiry, SellerGadgetsInquiry, } from '../../libs/dto/gadget/gadget.input';
 import { GadgetUpdate } from '../../libs/dto/gadget/gadget.update';
 import { MemberType } from '../../libs/enums/member.enum';
 import { AuthMember } from '../auth/decorators/authMember.decorator';
@@ -57,4 +57,32 @@ export class GadgetResolver {
 		console.log('Query>> getGadgets');
 		return await this.gadgetService.getGadgets(memberId, input);
 	}
+
+	@Roles(MemberType.SELLER)
+	@UseGuards(RolesGuard)
+	@Query((returns) => Gadgets)
+	public async getSellerGadgets(
+		@Args('input') input: SellerGadgetsInquiry,
+		@AuthMember('_id') memberId: ObjectId,
+	): Promise<Gadgets> {
+		console.log('Query>> getSellerGadgets');
+		return await this.gadgetService.getSellerGadgets(memberId, input);
+	} 
+
+
+	/* // *******************************************************************
+	!																			ADMIN 
+	* ***********************************************************************/
+
+	@Roles(MemberType.ADMIN)
+	@UseGuards(RolesGuard)
+	@Query((returns) => Gadgets)
+	public async getAllGadgetsByAdmin(
+		@Args('input') input: AllGadgetsInquiry,
+		@AuthMember('_id') memberId: ObjectId,
+	): Promise<Gadgets> {
+		console.log('Query>> getAllGadgetsByAdmin');
+		return await this.gadgetService.getAllGadgetsByAdmin(input);
+	}
+
 }

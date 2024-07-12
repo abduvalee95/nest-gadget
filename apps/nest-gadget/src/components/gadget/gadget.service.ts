@@ -2,7 +2,7 @@ import { BadRequestException, Injectable, InternalServerErrorException } from '@
 import { Gadget, Gadgets } from '../../libs/dto/gadget/gadget'
 import { Model, ObjectId } from 'mongoose'
 import { InjectModel } from '@nestjs/mongoose'
-import { GadgetInput, GadgetsInquiry } from '../../libs/dto/gadget/gadget.input'
+import { AllGadgetsInquiry, GadgetInput, GadgetsInquiry, SellerGadgetsInquiry } from '../../libs/dto/gadget/gadget.input'
 import { MemberService } from '../member/member.service'
 import { Message } from '../../libs/enums/common.enums'
 import { StatisticModifier, T } from '../../libs/types/common'
@@ -61,28 +61,6 @@ export class GadgetService {
 			targetGadget.memberData = await this.memberService.getMember(null, targetGadget.memberId);
 			return targetGadget;
 		}
-	
-
-
-	/* // *******************************************************************
-	!																			EDITOR 
-	* ***********************************************************************/
-	public async propertyStatsEditor(input: StatisticModifier): Promise<Gadget> {
-		console.log('memberStatsEditor:::');
-
-		const { _id, targetKey, modifier } = input;
-		return await this.gadgetModel
-			.findByIdAndUpdate(
-				_id,
-				{ $inc: { [targetKey]: modifier } },
-				{
-					new: true,
-				},
-			)
-			.exec();
-	}
-
-
 
 	public async updateGadget(memberId: ObjectId, input: GadgetUpdate): Promise<Gadget> {
 		let { gadgetStatus, soldAt, deletedAt } = input,
@@ -116,9 +94,9 @@ export class GadgetService {
 		const sort: T = { [input?.sort ?? 'createdAt']: input?.direction ?? Direction.DESC }; 
 
 		//shape
-/* 		this.shapeMatchQuery(match, input); // complex logic bolgani uchuun aloxidayozdik
+		this.shapeMatchQuery(match, input); // complex logic bolgani uchuun aloxidayozdik
 		console.log(match);
- */
+
 		const result = await this.gadgetModel
 			.aggregate([
 				{ $match: match },
@@ -144,6 +122,95 @@ export class GadgetService {
 	}
 
 
+
+	public async getSellerGadgets(memberId: ObjectId, input: SellerGadgetsInquiry): Promise<Gadgets> {
+		const { gadgetStatus } = input.search;
+		if (gadgetStatus === GadgetStatus.DELETE) throw new BadRequestException(Message.NOT_ALLOWED_REQUEST);
+
+		const match: T = { memberId: memberId, gadgetStatus: gadgetStatus ?? { $ne: GadgetStatus.DELETE } }; //Xar qanday memberlarni olib Berish ikk Agent user
+		const sort: T = { [input?.sort ?? 'createdAt']: input?.direction ?? Direction.DESC }; // sort xamda direction kiritilmagan  bolsa createdAt da xosil qiladi Directiondi Desc da xosil qiladi -1
+
+		const result = await this.gadgetModel
+			.aggregate([
+				{ $match: match },
+				{ $sort: sort },
+				{
+					$facet: {
+						/** bir nechta piplenilarni birvaqtda amalga oshirmoqchi bolsek */
+						list: [
+							{ $skip: (input.page - 1) * input.limit },
+							{ $limit: input.limit },
+							lookupMember,
+							{ $unwind: '$memberData' },
+						], // biz talab etayotgan propperties bolish mm
+						metaCounter: [{ $count: 'total' }], // umumiy memberrlarni chiqaradi
+					},
+				},
+			])
+			.exec();
+		if (!result.length) throw new InternalServerErrorException(Message.NO_DATA_FOUND);
+		return result[0];
+	}
+
+
+	/* // *******************************************************************
+	!																			ADMIN 
+	* ***********************************************************************/
+
+	public async getAllGadgetsByAdmin(input: AllGadgetsInquiry): Promise<Gadgets> {
+		const { gadgetStatus, gadgetLocationList } = input.search;
+
+		const match: T = {};
+		const sort: T = { [input?.sort ?? 'createdAt']: input?.direction ?? Direction.DESC };
+
+		if (gadgetStatus) match.gadgetStatus = gadgetStatus;
+		if (gadgetLocationList) match.gadgetLocation = { $in: gadgetLocationList };
+		const result = await this.gadgetModel
+			.aggregate([
+				{ $match: match },
+				{ $sort: sort },
+				{
+					$facet: {
+						/** bir nechta piplenilarni birvaqtda amalga oshirmoqchi bolsek */
+						list: [
+							{ $skip: (input.page - 1) * input.limit }, // pagination
+							{ $limit: input.limit }, // [property1, property2]
+							lookupMember, // [memberData]
+							{ $unwind: '$memberData' }, 
+						],
+						metaCounter: [{ $count: 'total' }],
+					},
+				},
+			])
+			.exec();
+		if (!result.length) throw new InternalServerErrorException(Message.NO_DATA_FOUND);
+		return result[0];
+	}
+
+
+
+/* // *******************************************************************
+	!																			EDITOR 
+	* ***********************************************************************/
+	public async propertyStatsEditor(input: StatisticModifier): Promise<Gadget> {
+		console.log('memberStatsEditor:::');
+
+		const { _id, targetKey, modifier } = input;
+		return await this.gadgetModel
+			.findByIdAndUpdate(
+				_id,
+				{ $inc: { [targetKey]: modifier } },
+				{
+					new: true,
+				},
+			)
+			.exec();
+	}
+
+
+	/* // *******************************************************************
+	!																			SHAPING
+	* ***********************************************************************/
 	private shapeMatchQuery(match: T, input: GadgetsInquiry): void {
 		const {
 			memberId,
