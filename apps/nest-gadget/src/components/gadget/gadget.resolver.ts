@@ -85,4 +85,24 @@ export class GadgetResolver {
 		return await this.gadgetService.getAllGadgetsByAdmin(input);
 	}
 
+	@Roles(MemberType.ADMIN)
+	@UseGuards(RolesGuard)
+	@Mutation((returns) => Gadget)
+	public async updateGadgetByAdmin(@Args('input') input: GadgetUpdate): Promise<Gadget> {
+		console.log('Query:>: updateProppertyByAdmin');
+		input._id = shapeIntoMongoObjectId(input._id);
+		return await this.gadgetService.updateGadgetByAdmin(input);
+	}
+
+	@Roles(MemberType.ADMIN)
+	@UseGuards(RolesGuard)
+	@Mutation((returns) => Gadget)
+	public async removeGadgetByAdmin(
+		@Args('gadgetId') input: string, 
+	): Promise<Gadget> {
+		console.log('Query:>: removeGadgetByADmin');
+		const gadgetId = shapeIntoMongoObjectId(input);
+		return await this.gadgetService.removeGadgetByAdmin(gadgetId);
+	}
+
 }

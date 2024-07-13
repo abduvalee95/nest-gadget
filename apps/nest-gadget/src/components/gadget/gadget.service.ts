@@ -10,7 +10,7 @@ import { GadgetStatus } from '../../libs/enums/gadget.enum'
 import { ViewGroup } from '../../libs/enums/view.enum'
 import { ViewService } from '../view/view.service'
 import { GadgetUpdate } from '../../libs/dto/gadget/gadget.update'
-import moment from 'moment'
+import * as moment from 'moment';
 import { Direction } from '../../libs/enums/member.enum'
 import { lookupMember, shapeIntoMongoObjectId } from '../../libs/config'
 
@@ -189,6 +189,42 @@ export class GadgetService {
 
 
 
+	public async updateGadgetByAdmin(input: GadgetUpdate): Promise<Gadget> {
+		let { gadgetStatus, soldAt, deletedAt } = input,
+			search: T = {
+				_id: input._id,
+				gadgetStatus: GadgetStatus.ACTIVE,
+			};
+			console.log(search)
+		if (gadgetStatus === GadgetStatus.SOLD) soldAt = moment().toDate();
+		else if (gadgetStatus === GadgetStatus.DELETE) deletedAt = moment().toDate();
+
+		const result = await this.gadgetModel
+			.findOneAndUpdate(search, input, {
+				new: true,
+			})
+			.exec();
+		if (!result) throw new InternalServerErrorException(Message.UPDATE_FALED);
+
+		if (soldAt || deletedAt) {
+			await this.memberService.memberStatsEditor({
+				_id: result.memberId,
+				targetKey: 'memberGadget',
+				modifier: -1,
+			});
+		}
+		return result;
+	}
+
+	public async removeGadgetByAdmin(gadgetId: ObjectId): Promise<Gadget> {
+		const search: T = { _id: gadgetId, gadgetStatus: GadgetStatus.DELETE };
+		const result = await this.gadgetModel.findOneAndDelete(search).exec();
+		if (!result) throw new InternalServerErrorException(Message.REMOVE_FAILED);
+
+		return result;
+	}
+
+
 /* // *******************************************************************
 	!																			EDITOR 
 	* ***********************************************************************/
@@ -209,7 +245,7 @@ export class GadgetService {
 
 
 	/* // *******************************************************************
-	!																			SHAPING
+	!																			SHAPEING
 	* ***********************************************************************/
 	private shapeMatchQuery(match: T, input: GadgetsInquiry): void {
 		const {

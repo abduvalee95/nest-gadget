@@ -15,11 +15,11 @@ export class Gadget {
 	@Field(() => GadgetStatus)
 	gadgetStatus: GadgetStatus;
 
-	@Field(() => GadgetLocation) //Bur datadan kelayotgan typelar
+	@Field(() => GadgetLocation) 
 	gadgetLocation: GadgetLocation;
 
 	@Field(() => String)
-	gadgetColor: String;
+	gadgetColor: string;
 
 	@Field(() => String)
 	gadgetTitle: string;
@@ -80,7 +80,7 @@ export class Gadget {
 
 	//** From Agregation */
 
-	@Field(() => Member, { nullable: true }) // xosil qilgan agentni memberDatasni  kiriyyabmiz
+	@Field(() => Member, { nullable: true }) 
 	memberData?: Member;
 
 /* 	@Field(() => [MeLiked], { nullable: true })
