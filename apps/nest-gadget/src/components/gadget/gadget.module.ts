@@ -6,6 +6,7 @@ import { GadgetService } from './gadget.service';
 import { AuthModule } from '../auth/auth.module'
 import { ViewModule } from '../view/view.module'
 import { MemberModule } from '../member/member.module'
+import { LikeModule } from '../like/like.module'
 
 @Module({
 	imports: [
@@ -18,6 +19,7 @@ import { MemberModule } from '../member/member.module'
     AuthModule,
     ViewModule,
     MemberModule,
+    LikeModule,
 	],
 	providers: [GadgetService, GadgetResolver],
 	exports:[GadgetService]

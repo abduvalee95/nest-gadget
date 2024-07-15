@@ -11,6 +11,7 @@ import { Roles } from '../auth/decorators/roles.decorator';
 import { RolesGuard } from '../auth/guards/roles.guard';
 import { WithoutGuard } from '../auth/guards/without.guard';
 import { GadgetService } from './gadget.service';
+import { AuthGuard } from '../auth/guards/auth.guard'
 
 @Resolver()
 export class GadgetResolver {
@@ -70,6 +71,19 @@ export class GadgetResolver {
 	} 
 
 
+	/* // *******************************************************************
+	!																			LIKE
+	* ***********************************************************************/
+	@UseGuards(AuthGuard)
+	@Mutation(() => Gadget)
+	public async likeTargetGadget(
+		@Args('gadgetId') input: string,
+		@AuthMember('_id') memberId: ObjectId,
+	): Promise<Gadget> {
+		console.log('LikeTargetMember');
+		const likeRefId = shapeIntoMongoObjectId(input);
+		return await this.gadgetService.likeTargetGadget(memberId, likeRefId);
+	}
 	/* // *******************************************************************
 	!																			ADMIN 
 	* ***********************************************************************/

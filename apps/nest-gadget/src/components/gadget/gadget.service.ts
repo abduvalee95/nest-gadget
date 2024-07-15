@@ -13,6 +13,9 @@ import { GadgetUpdate } from '../../libs/dto/gadget/gadget.update'
 import * as moment from 'moment';
 import { Direction } from '../../libs/enums/member.enum'
 import { lookupMember, shapeIntoMongoObjectId } from '../../libs/config'
+import { LikeInput } from '../../libs/dto/like/like.input'
+import { LikeGroup } from '../../libs/enums/like.enum'
+import { LikeService } from '../like/like.service'
 
 @Injectable()
 export class GadgetService {
@@ -20,6 +23,7 @@ export class GadgetService {
 		@InjectModel('Gadget') private readonly gadgetModel: Model<Gadget>,
 		private viewService: ViewService,
 		private memberService: MemberService,
+		private likeService: LikeService,
 	){}
 
 		public async createGadget(input: GadgetInput): Promise<Gadget> {
@@ -152,6 +156,29 @@ export class GadgetService {
 		return result[0];
 	}
 
+
+	/* // *******************************************************************
+	!																			LIKE 
+	* ***********************************************************************/
+
+	public async likeTargetGadget(memberId: ObjectId, likeRefId: ObjectId): Promise<Gadget> {
+		//variable ochamiz va izlemiz id :refId sini memberStatus.Active bolish kk
+		const target = await this.gadgetModel.findOne({ _id: likeRefId, gadgetStatus: GadgetStatus.ACTIVE }).exec();
+		if (!target) throw new InternalServerErrorException(Message.NO_DATA_FOUND);
+
+		const input: LikeInput = {
+			memberId: memberId,
+			likeRefId: likeRefId,
+			likeGroup: LikeGroup.GADGET,
+		};
+
+		//Togle
+		const modifier: number = await this.likeService.toggleLike(input);
+		const result = await this.propertyStatsEditor({ _id: likeRefId, targetKey: 'propertyLikes', modifier: modifier });
+
+		if (!result) throw new InternalServerErrorException(Message.SOMETHING_WENT_WRONG);
+		return result;
+	}
 
 	/* // *******************************************************************
 	!																			ADMIN 
