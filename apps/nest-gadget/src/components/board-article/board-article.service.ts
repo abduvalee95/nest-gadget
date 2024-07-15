@@ -43,7 +43,7 @@ public async getBoardArticle(memberId: ObjectId, articleId: ObjectId): Promise<B
 		articleStatus: BoardArticleStatus.ACTIVE,
 	};
 
-	const targetBoardArticle: BoardArticle = await this.boardArticleModel.findOne(search).lean().exec();
+	const targetBoardArticle: BoardArticle = await this.boardArticleModel.findOne(search).lean().exec(); //? lean() bu Modify qilish uchun imkoniyat beradi object qilib beradi 
 	if (!targetBoardArticle) throw new InternalServerErrorException(Message.NO_DATA_FOUND);
 
 	if (memberId) {

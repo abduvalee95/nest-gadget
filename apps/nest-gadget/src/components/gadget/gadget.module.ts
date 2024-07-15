@@ -20,5 +20,6 @@ import { MemberModule } from '../member/member.module'
     MemberModule,
 	],
 	providers: [GadgetService, GadgetResolver],
+	exports:[GadgetService]
 })
 export class GadgetModule {}

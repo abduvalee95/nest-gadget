@@ -55,6 +55,66 @@ export const lookupVisit = {
 		as: 'visitedGadget.memberData',
 	},
 };
+
+/* // *******************************************************************
+	!																			LookupAuthMemberFollow 
+	* ***********************************************************************/
+interface lookupAuthMemberFollowed{
+	followerId: T;
+	followingId: string;
+}
+
+export const lookupAuthMemberFollowed = (input: lookupAuthMemberFollowed) => {
+	const {followerId,followingId} = input
+	return {
+		$lookup: {
+			from: 'follows', // qaysi collectiondan izlasin
+			let: {
+				//search mehanizmga Vasriablelar
+				localFollowerId: followerId, // '$_id'
+				localFollowingId: followingId,
+				localMyFavorite: true, //fronenda foyda beradi
+			},
+			pipeline: [
+				{
+					$match: {
+						$expr: {
+							$and: [{ $eq: ['$followerId', '$$localFollowerId'] }, { $eq: ['$followingId', '$$localFollowingId'] }], //Solishtirish mantigi  Eq 'nimalarni solishtirishimizni kochirib olamiz'
+						},
+					},
+				},
+				{
+					$project: {
+						_id: 0,
+						followerId: 1,
+						followingId: 1,
+						myFollowing: '$$localMyFavorite', // togridan togri true qilmadik agar shu mantiq togri ishlasa deb belgilab oldik
+					},
+				},
+			],
+			as: 'meFollowed', // qanday nom bilan saqlashlik
+		},
+	};
+};
+
+export const lookupFollowingData = {
+	$lookup: {
+		from: 'members', //uni shu collectiondan
+		localField: 'followingId',
+		foreignField: '_id', //shu nom bilan izledi
+		as: 'followingData', //shundoq save qiladi
+	},
+};
+
+export const lookupFollowerData = {
+	$lookup: {
+		from: 'members',
+		localField: 'followerId',
+		foreignField: '_id',
+		as: 'followerData',
+	},
+};
+
 /* // *******************************************************************
 	!																			LookupAuthMemberLiked 
 	* ***********************************************************************/
