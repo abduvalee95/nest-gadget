@@ -3,7 +3,7 @@ import { Args, Mutation, Query, Resolver } from '@nestjs/graphql';
 import { ObjectId } from 'mongoose';
 import { shapeIntoMongoObjectId } from '../../libs/config';
 import { Gadget, Gadgets } from '../../libs/dto/gadget/gadget';
-import { AllGadgetsInquiry, GadgetInput, GadgetsInquiry, SellerGadgetsInquiry, } from '../../libs/dto/gadget/gadget.input';
+import { AllGadgetsInquiry, GadgetInput, GadgetsInquiry, OrdinaryInquiry, SellerGadgetsInquiry, } from '../../libs/dto/gadget/gadget.input';
 import { GadgetUpdate } from '../../libs/dto/gadget/gadget.update';
 import { MemberType } from '../../libs/enums/member.enum';
 import { AuthMember } from '../auth/decorators/authMember.decorator';
@@ -72,6 +72,31 @@ export class GadgetResolver {
 
 
 	/* // *******************************************************************
+	!																			Favorite
+	* ***********************************************************************/
+
+
+	@UseGuards(AuthGuard)
+	@Query((returns) => Gadgets)
+	public async getFavorites(
+		@Args('input') input: OrdinaryInquiry,
+		@AuthMember('_id') memberId: ObjectId,
+	): Promise<Gadgets> {
+		console.log('Query>> getFavorites');
+		return await this.gadgetService.getFavorites(memberId, input);
+	}
+
+	@UseGuards(AuthGuard)
+	@Query((returns) => Gadgets)
+	public async getVisited(
+		@Args('input') input: OrdinaryInquiry,
+		@AuthMember('_id') memberId: ObjectId,
+	): Promise<Gadgets> {
+		console.log('Query>> getVisited');
+		return await this.gadgetService.getVisited(memberId, input);
+	}
+
+	/* // *******************************************************************
 	!																			LIKE
 	* ***********************************************************************/
 	@UseGuards(AuthGuard)
@@ -80,14 +105,14 @@ export class GadgetResolver {
 		@Args('gadgetId') input: string,
 		@AuthMember('_id') memberId: ObjectId,
 	): Promise<Gadget> {
-		console.log('LikeTargetMember');
+		console.log('LikeTargetGadget');
 		const likeRefId = shapeIntoMongoObjectId(input);
 		return await this.gadgetService.likeTargetGadget(memberId, likeRefId);
 	}
+	
 	/* // *******************************************************************
 	!																			ADMIN 
 	* ***********************************************************************/
-
 	@Roles(MemberType.ADMIN)
 	@UseGuards(RolesGuard)
 	@Query((returns) => Gadgets)

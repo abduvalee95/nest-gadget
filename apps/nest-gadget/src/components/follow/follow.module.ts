@@ -7,7 +7,7 @@ import { AuthModule } from '../auth/auth.module'
 import { MemberModule } from '../member/member.module'
 
 @Module({
-  imports: [
+	imports: [
 		MongooseModule.forFeature([
 			{
 				name: 'Follow',

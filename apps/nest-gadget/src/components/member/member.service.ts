@@ -14,12 +14,16 @@ import { ViewService } from '../view/view.service';
 import { LikeInput } from '../../libs/dto/like/like.input'
 import { LikeGroup } from '../../libs/enums/like.enum'
 import { LikeService } from '../like/like.service'
+import { Follower, Following, MeFollowed } from '../../libs/dto/follow/follow'
+import { lookupAuthMemberLiked } from '../../libs/config'
 
 @Injectable()
 export class MemberService {
 	constructor(
 		@InjectModel('Member')
 		private readonly memberModel: Model<Member>,
+		@InjectModel('Follow')
+		private readonly followModel: Model<Follower | Following>,
 		private readonly authService: AuthService,
 		private readonly viewService: ViewService,
 		private readonly likeService: LikeService,
@@ -99,13 +103,13 @@ export class MemberService {
 				await this.memberModel.findOneAndUpdate(search, { $inc: { memberViews: 1 } }, { new: true }).exec();
 				targetMember.memberViews++;
 			}
-			/*
+
 			//* meLiked
 			const likeInput = { memberId: memberId, likeRefId: targetId, likeGroup: LikeGroup.MEMBER };
 			targetMember.meLiked = await this.likeService.checkLikeExistance(likeInput);
 
 			//* meFolloweed
-			targetMember.meFollowed = await this.checkSubscription(memberId, targetId);*/
+			targetMember.meFollowed = await this.checkSubscription(memberId, targetId);
 		}
 
 		return targetMember;
@@ -131,7 +135,7 @@ export class MemberService {
 						list: [
 							{ $skip: (input.page - 1) * input.limit },
 							{ $limit: input.limit },
-							//lookupAuthMemberLiked(memberId),
+							lookupAuthMemberLiked(memberId),
 						],
 						metaCounter: [{ $count: 'total' }],
 					},
@@ -140,6 +144,17 @@ export class MemberService {
 			.exec();
 		if (!result.length) throw new InternalServerErrorException(Message.NO_DATA_FOUND);
 		return result[0];
+	}
+
+
+
+		/* // *******************************************************************
+	!																			CHECK 
+	* ***********************************************************************/
+
+	private async checkSubscription(followerId: ObjectId, followingId: ObjectId): Promise<MeFollowed[]> {
+		const result = await this.followModel.findOne({ followingId: followingId, followerId: followerId }).exec();
+		return result ? [{ followerId: followerId, followingId: followingId, myFollowing: true }] : [];
 	}
 
 		/* // *******************************************************************

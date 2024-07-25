@@ -4,6 +4,7 @@ import { AppModule } from './app.module';
 import { LoggingInterceptor } from './libs/interceptor/Logging.interceptor';
 import { graphqlUploadExpress } from 'graphql-upload';
 import * as express from 'express';
+import { WsAdapter } from '@nestjs/platform-ws'
 
 
 async function bootstrap() {
@@ -15,6 +16,8 @@ async function bootstrap() {
 	app.use(graphqlUploadExpress({ maxFileSize: 11500000, maxFile: 10 })); //** miqdori va nechta yuklash kkligni yozdik */
 	
 	app.use('/uploads', express.static('./uploads')); //**Tashqi olamga static folder Sifatida ochib berdik */
+
+	app.useWebSocketAdapter(new WsAdapter(app))
 	await app.listen(process.env.PORT_API ?? 3000);
 }
 bootstrap();

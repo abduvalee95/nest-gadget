@@ -2,7 +2,7 @@ import { BadRequestException, Injectable, InternalServerErrorException } from '@
 import { Gadget, Gadgets } from '../../libs/dto/gadget/gadget'
 import { Model, ObjectId } from 'mongoose'
 import { InjectModel } from '@nestjs/mongoose'
-import { AllGadgetsInquiry, GadgetInput, GadgetsInquiry, SellerGadgetsInquiry } from '../../libs/dto/gadget/gadget.input'
+import { AllGadgetsInquiry, GadgetInput, GadgetsInquiry, OrdinaryInquiry, SellerGadgetsInquiry } from '../../libs/dto/gadget/gadget.input'
 import { MemberService } from '../member/member.service'
 import { Message } from '../../libs/enums/common.enums'
 import { StatisticModifier, T } from '../../libs/types/common'
@@ -12,7 +12,7 @@ import { ViewService } from '../view/view.service'
 import { GadgetUpdate } from '../../libs/dto/gadget/gadget.update'
 import * as moment from 'moment';
 import { Direction } from '../../libs/enums/member.enum'
-import { lookupMember, shapeIntoMongoObjectId } from '../../libs/config'
+import { lookupAuthMemberLiked, lookupMember, shapeIntoMongoObjectId } from '../../libs/config'
 import { LikeInput } from '../../libs/dto/like/like.input'
 import { LikeGroup } from '../../libs/enums/like.enum'
 import { LikeService } from '../like/like.service'
@@ -59,8 +59,8 @@ export class GadgetService {
 					targetGadget.gadgetViews++;
 				}
 				//meLiked
-				// const likeInput = { memberId: memberId, likeRefId: propertyId, likeGroup: LikeGroup.PROPERTY };
-				// targetProperty.meLiked = await this.likeService.checkLikeExistance(likeInput);
+				const likeInput = { memberId: memberId, likeRefId: gadgetId, likeGroup: LikeGroup.GADGET };
+				targetGadget.meLiked = await this.likeService.checkLikeExistance(likeInput);
 			}
 			targetGadget.memberData = await this.memberService.getMember(null, targetGadget.memberId);
 			return targetGadget;
@@ -112,7 +112,7 @@ export class GadgetService {
 							{ $skip: (input.page - 1) * input.limit },
 							{ $limit: input.limit },
 							//me liked
-							// lookupAuthMemberLiked(memberId),
+							lookupAuthMemberLiked(memberId),
 							lookupMember,
 							{ $unwind: '$memberData' },
 						], 
@@ -126,6 +126,14 @@ export class GadgetService {
 	}
 
 
+
+	public async getFavorites(memberId: ObjectId, input: OrdinaryInquiry): Promise<Gadgets> {
+		return await this.likeService.getFavoriteProperties(memberId, input); // Asosiy logicni likeserviceda qilamiz 
+	}
+
+	public async getVisited(memberId: ObjectId, input: OrdinaryInquiry): Promise<Gadgets> {
+		return await this.viewService.getVisitedGadgets(memberId, input); // Asosiy logicni likeserviceda qilamiz 
+	}
 
 	public async getSellerGadgets(memberId: ObjectId, input: SellerGadgetsInquiry): Promise<Gadgets> {
 		const { gadgetStatus } = input.search;
@@ -174,7 +182,7 @@ export class GadgetService {
 
 		//Togle
 		const modifier: number = await this.likeService.toggleLike(input);
-		const result = await this.propertyStatsEditor({ _id: likeRefId, targetKey: 'propertyLikes', modifier: modifier });
+		const result = await this.propertyStatsEditor({ _id: likeRefId, targetKey: 'gadgetLikes', modifier: modifier });
 
 		if (!result) throw new InternalServerErrorException(Message.SOMETHING_WENT_WRONG);
 		return result;

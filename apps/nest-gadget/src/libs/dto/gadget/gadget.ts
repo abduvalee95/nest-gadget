@@ -1,7 +1,7 @@
 import { Field, Int, ObjectType } from '@nestjs/graphql';
 import { ObjectId } from 'mongoose';
 import { Member, TotalCounter } from '../member/member';
-// import { MeLiked } from '../like/like';
+import { MeLiked } from '../like/like';
 import { GadgetLocation, GadgetStatus, GadgetType } from '../../enums/gadget.enum'
 
 @ObjectType()
@@ -83,8 +83,8 @@ export class Gadget {
 	@Field(() => Member, { nullable: true }) 
 	memberData?: Member;
 
-/* 	@Field(() => [MeLiked], { nullable: true })
-	meLiked?: MeLiked[]; */
+	@Field(() => [MeLiked], { nullable: true })
+	meLiked?: MeLiked[];
 }
 
 @ObjectType()
