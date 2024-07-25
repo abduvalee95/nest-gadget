@@ -41,7 +41,7 @@ export class LikeService {
 		return result ? [{ memberId: memberId, likeRefId: likeRefId, myFavorite: true }] : [];
 	}
 
-	public async getFavoriteProperties(memberId: ObjectId, input: OrdinaryInquiry): Promise<Gadgets> {
+	public async getFavoriteGadgets(memberId: ObjectId, input: OrdinaryInquiry): Promise<Gadgets> {
 		const { page, limit } = input;
 		const match: T = { likeGroup: LikeGroup.GADGET, memberId: memberId };
 			//jami Propertylargabosigan likeni agrigation orqalik izlamoqda 
@@ -51,13 +51,13 @@ export class LikeService {
 				{ $sort: { updatedAt: -1 } },
 				{
 					$lookup: {
-						from: 'properties', // shu erdan qidirib "ForeignFielddan " idga teng bolganini izlamoqda
+						from: 'gadgets', // shu erdan qidirib "ForeignFielddan " idga teng bolganini izlamoqda
 						localField: 'likeRefId', // shu Id larimizni ^
 						foreignField: '_id', //^ bihiilni izlemiz 
-						as: 'favoriteProperty',
+						as: 'favoriteGadget',
 					},
 				},
-				{ $unwind: '$favoriteProperty' }, //oddiy arrayni ichidan tashqariga chikarib ber deyabmiz
+				{ $unwind: '$favoriteGadget' }, //oddiy arrayni ichidan tashqariga chikarib ber deyabmiz
 				{
 					$facet: {
 						//Properties korinishida chikarish  List korinishdahosil qilish
@@ -65,16 +65,17 @@ export class LikeService {
 							{ $skip: (page - 1) * limit },
 							{ $limit: limit },
 							lookupFavorite, // favorite propertyni hosil qilgan agentni shakilantirib 
-							{ $unwind: '$favoriteProperty.memberData' }, //arraydan hosil qilib ber
+							{ $unwind: '$favoriteGadget.memberData' }, //arraydan hosil qilib ber
 						],
 						metaCounter:[{$count: 'total'}]
 					},
 				},
-			])
+			]) 
 			.exec();
+			console.log("data>>>",data)
 
 		const result: Gadgets = { list: [], metaCounter: data[0].metaCounter };
-		result.list = data[0].list.map((ele) => ele.favoriteProperty); // xarbir logni ichida joylashgannini yahlit tarzda olvoldik : Properties dto ni beradi 
+		result.list = data[0].list.map((ele) => ele.favoriteGadget); // xarbir logni ichida joylashgannini yahlit tarzda olvoldik : Properties dto ni beradi 
 		return result
 	}
 }

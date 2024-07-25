@@ -59,9 +59,9 @@ export const lookupVisit = {
 export const lookupFavorite = {
 	$lookup: {
 		from: 'members',
-		localField: 'favoriteProperty.memberId',
+		localField: 'favoriteGadget.memberId',
 		foreignField: '_id',
-		as: 'favoriteProperty.memberData',
+		as: 'favoriteGadget.memberData',
 	},
 };
 

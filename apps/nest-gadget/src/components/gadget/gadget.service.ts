@@ -128,7 +128,7 @@ export class GadgetService {
 
 
 	public async getFavorites(memberId: ObjectId, input: OrdinaryInquiry): Promise<Gadgets> {
-		return await this.likeService.getFavoriteProperties(memberId, input); // Asosiy logicni likeserviceda qilamiz 
+		return await this.likeService.getFavoriteGadgets(memberId, input); // Asosiy logicni likeserviceda qilamiz 
 	}
 
 	public async getVisited(memberId: ObjectId, input: OrdinaryInquiry): Promise<Gadgets> {
