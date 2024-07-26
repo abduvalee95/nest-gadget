@@ -1,5 +1,5 @@
 import { NestFactory } from '@nestjs/core';
-import { GadgetBatchModule } from './gadget-batch.module';
+import { GadgetBatchModule } from './gadget-batch.module'
 
 async function bootstrap() {
   const app = await NestFactory.create(GadgetBatchModule);
