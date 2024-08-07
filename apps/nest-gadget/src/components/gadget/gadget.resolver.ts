@@ -17,7 +17,7 @@ import { AuthGuard } from '../auth/guards/auth.guard'
 export class GadgetResolver {
 	constructor(private readonly gadgetService: GadgetService) {}
 
-	@Roles(MemberType.SELLER)
+	@Roles(MemberType.AGENT)
 	@UseGuards(RolesGuard)
 	@Mutation(() => Gadget)
 	public async createGadget(@Args('input') input: GadgetInput, @AuthMember('_id') memberId: ObjectId): Promise<Gadget> {
@@ -37,7 +37,7 @@ export class GadgetResolver {
 		return await this.gadgetService.getGadget(memberId, gadgetId);
 	}
 
-	@Roles(MemberType.SELLER)
+	@Roles(MemberType.AGENT)
 	@UseGuards(RolesGuard)
 	@Mutation((returns) => Gadget)
 	public async updateGadget(
@@ -59,7 +59,7 @@ export class GadgetResolver {
 		return await this.gadgetService.getGadgets(memberId, input);
 	}
 
-	@Roles(MemberType.SELLER)
+	@Roles(MemberType.AGENT)
 	@UseGuards(RolesGuard)
 	@Query((returns) => Gadgets)
 	public async getSellerGadgets(

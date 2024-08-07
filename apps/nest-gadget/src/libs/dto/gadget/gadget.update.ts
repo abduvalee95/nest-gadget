@@ -35,9 +35,9 @@ export class GadgetUpdate {
 	@Field(() => Number, { nullable: true })
 	gadgetPrice?: number;
 
-	@IsOptional()
-	@Field(() => Number, { nullable: true })
-	gadgetSize?: number;
+	// @IsOptional()
+	// @Field(() => Number, { nullable: true })
+	// gadgetSize?: number;
 
 	@IsOptional()
 	@IsInt()
@@ -47,7 +47,7 @@ export class GadgetUpdate {
 
 	@IsOptional()
 	@IsInt()
-	@Min(1)
+	// @Min(1)
 	@Field(() => Int, { nullable: true })
 	gadgetCapacity?: number;
 
@@ -60,13 +60,13 @@ export class GadgetUpdate {
 	@Field(() => String, { nullable: true })
 	gadgetDesc?: string;
 
-	@IsOptional()
-	@Field(() => Boolean, { nullable: true })
-	gadgetBarter?: boolean;
+	// @IsOptional()
+	// @Field(() => Boolean, { nullable: true })
+	// gadgetUsed?: boolean;
 
-	@IsOptional()
-	@Field(() => Boolean, { nullable: true })
-	gadgetRent?: boolean;
+	// @IsOptional()
+	// @Field(() => Boolean, { nullable: true })
+	// gadgetNew?: boolean;
 
 	soldAt?: Date;
 

@@ -36,10 +36,10 @@ const GadgetSchema = new Schema(
 			required: true,
 		},
 //gadgetSquare
-		gadgetDisplaySquare: {
+/* 		gadgetDisplaySquare: {
 			type: Number,
 			required: true,
-		},
+		}, */
 // bed
 		gadgetWeight: {
 			type: Number,
@@ -80,15 +80,15 @@ const GadgetSchema = new Schema(
 			type: String,
 		},
 
-		gadgetBarter: {
+/* 		gadgetUsed: {
 			type: Boolean,
 			default: false,
 		},
 
-		gadgetRent: {
+		gadgetNew: {
 			type: Boolean,
 			default: false,
-		},
+		}, */
 
 		memberId: {
 			type: Schema.Types.ObjectId, // kim kiritganligni ozida saqlaydi

@@ -20,7 +20,8 @@ export const availbleAgentSorts = ['createdAt', 'updatedAt', 'memberLikes', 'mem
 
 export const availbleMemberSorts = ['createdAt', 'updatedAt', 'memberLikes', 'memberViews'];
 
-export const availableOptions = ['gadgetBarter', 'gadgetRent'];
+export const availableOptions = ['gadgetUsed', 'gadgetNew'];
+export const availableMemory = [64,128,256,512,1];
 
 export const availableGadgetSorts = [
 	'createdAt',

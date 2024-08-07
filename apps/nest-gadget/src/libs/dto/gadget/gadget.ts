@@ -27,8 +27,8 @@ export class Gadget {
 	@Field(() => Number)
 	gadgetPrice: number;
 
-	@Field(() => Number)
-	gadgetDisplaySquare: number;
+	// @Field(() => Number)
+	// gadgetDisplaySquare: number;
 
 	@Field(() => Int)
 	gadgetWeight: number;
@@ -54,11 +54,11 @@ export class Gadget {
 	@Field(() => String, { nullable: true })
 	gadgetDesc?: string;
 
-	@Field(() => Boolean)
-	gadgetBarter: boolean;
+	// @Field(() => Boolean)
+	// gadgetUsed: boolean;
 
-	@Field(() => Boolean)
-	gadgetRent: boolean;
+	// @Field(() => Boolean)
+	// gadgetNew: boolean;
 
 	@Field(() => String)
 	memberId: ObjectId;

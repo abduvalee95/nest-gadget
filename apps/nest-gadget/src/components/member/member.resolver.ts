@@ -46,7 +46,7 @@ export class MemberResolver {
 
 	//* 														checkAuthRoles
 
-	@Roles(MemberType.SELLER, MemberType.USER)
+	@Roles(MemberType.AGENT, MemberType.USER)
 	@UseGuards(RolesGuard) //* Autherization tekshiriladi
 	@Query(() => String)
 	public async checkAuthRoles(@AuthMember() authMember: Member): Promise<string> {

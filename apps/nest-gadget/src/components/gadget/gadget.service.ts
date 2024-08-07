@@ -289,9 +289,9 @@ export class GadgetService {
 			gadgetCapacityList,
 			gadgetWeight,
 			typeList,
-			periodsRange,
+			// periodsRange,
 			pricesRange,
-			gadgetDisplaySquare,
+			// gadgetDisplaySquare,
 			options,
 			text,
 		} = input.search;
@@ -302,9 +302,9 @@ export class GadgetService {
 		if (typeList && typeList.length) match.gadgetType = { $in: typeList };
 
 		if (pricesRange) match.gadgetPrice = { $gte: pricesRange.start, $lte: pricesRange.end };
-		if (periodsRange) match.createdAt = { $gte: periodsRange.start, $lte: periodsRange.end };
+		/* if (periodsRange) match.createdAt = { $gte: periodsRange.start, $lte: periodsRange.end };
 		if (gadgetDisplaySquare) match.gadgetDisplaySquare = { $gte: gadgetDisplaySquare.start, $lte: gadgetDisplaySquare.end };
-
+ */
 		if (text) match.gadgetTitle = { $regex: new RegExp(text, 'i') };
 		if (options) {
 			match['$or'] = options.map((ele) => {

@@ -2,12 +2,11 @@
 import { Field, InputType, Int } from '@nestjs/graphql';
 import { IsIn, IsInt, IsNotEmpty, IsOptional, Length, Min } from 'class-validator';
 import { ObjectId } from 'mongoose';
-import { availableOptions, availableGadgetSorts } from '../../config';
+import { availableOptions, availableGadgetSorts, availableMemory } from '../../config';
 import { Direction } from '../../enums/member.enum';
 import { GadgetLocation, GadgetStatus, GadgetType } from '../../enums/gadget.enum'
 
 // Fronend dan Backendga argument sifatidda pass qilamiz
-
 @InputType()
 export class GadgetInput {
 	@IsNotEmpty()
@@ -33,9 +32,9 @@ export class GadgetInput {
 	@Field(() => Number)
 	gadgetPrice: number;
 
-	@IsOptional()
-	@Field(() => Number)
-	gadgetDisplaySquare: number;
+	// @IsOptional()
+	// @Field(() => Number)
+	// gadgetDisplaySquare: number;
 
 	@IsOptional()
 	@IsInt()
@@ -45,7 +44,7 @@ export class GadgetInput {
 
 	@IsNotEmpty()
 	@IsInt()
-	@Min(1)
+	// @Min(1)
 	@Field(() => Int)
 	gadgetCapacity: number;
 
@@ -58,14 +57,14 @@ export class GadgetInput {
 	@Field(() => String, { nullable: true })
 	gadgetDesc?: string;
 
-	@IsOptional()
+/* 	@IsOptional()
 	@Field(() => Boolean, { nullable: true })
-	propertyBarter?: boolean;
-
-	@IsOptional()
+	gadgetUsed?: boolean;
+ */
+/* 	@IsOptional()
 	@Field(() => Boolean, { nullable: true })
-	propertyRent?: boolean;
-
+	gadgetNew?: boolean;
+ */
 	//! Typelarimiz crash bolmasligi uchun ,  buning qiymatni request qilyatgan membernij Authenticationdan qabul qilamiz
 	memberId?: ObjectId; // Frontendan bu malumotni yuboirilsa agent boshqa agenti  idsdan foydalansaham b0oladi
 
@@ -132,9 +131,9 @@ class PISearch {
 	@Field(() => PriceRange, { nullable: true })
 	pricesRange?: PriceRange;
 
-	@IsOptional()
-	@Field(() => SquaresRange, { nullable: true })
-	gadgetDisplaySquare?: SquaresRange;
+	// @IsOptional()
+	// @Field(() => SquaresRange, { nullable: true })
+	// gadgetDisplaySquare?: SquaresRange;
 
 	@IsOptional()
 	@Field(() => PeriodsRange, { nullable: true })
