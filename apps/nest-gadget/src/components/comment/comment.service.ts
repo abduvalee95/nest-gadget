@@ -12,6 +12,8 @@ import { T } from '../../libs/types/common';
 import { BoardArticleService } from '../board-article/board-article.service';
 import { GadgetService } from '../gadget/gadget.service';
 import { MemberService } from '../member/member.service';
+import { NotificationService } from '../notification/notification.service'
+import { NotificationGroup, NotificationType } from '../../libs/enums/notification.enum'
 
 @Injectable()
 export class CommentService {
@@ -20,6 +22,7 @@ export class CommentService {
 		private readonly memberService: MemberService,
 		private readonly gadgetService: GadgetService,
 		private readonly boardArticleService: BoardArticleService,
+		private readonly notificationService: NotificationService,
 	) {}
 
 	public async createComment(memberId: ObjectId, input: CommentInput): Promise<Comment> {
@@ -27,6 +30,7 @@ export class CommentService {
 		let result = null;
 		try {
 			result = await this.commentModule.create(input);
+			// Comment hosil bolganda Notification hosil qilamiz Serivise iwledi  
 		} catch (error) {
 			console.log('Error CreateCommentServiceModel', error.message);
 			throw new BadRequestException(Message.CREATE_FAILED);
@@ -55,8 +59,49 @@ export class CommentService {
 				});
 				break;
 		}
+		await this.createCommentNotification(input,result)
 		if (!result) throw new InternalServerErrorException(Message.CREATE_FAILED);
 		return result;
+	}
+
+	private getNotificationGroup(commentGroup: CommentGroup): NotificationGroup {
+		switch (commentGroup) {
+			case CommentGroup.GADGET:
+				return NotificationGroup.GADGET;
+			case CommentGroup.ARTICLE:
+				return NotificationGroup.ARTICLE;
+			case CommentGroup.MEMBER:
+				return NotificationGroup.MEMBER;
+			default:
+				throw new BadRequestException('Invalid comment group for notification');
+		}
+	}
+
+	private async createCommentNotification(input: CommentInput, comment: Comment): Promise<void> {
+		try {
+			//@ts-ignore
+			await this.notificationService.toggleNotification(input.memberId, {
+				memberId: input.memberId,
+				notificationRefId: input.commentRefId,
+				notificationType: NotificationType.COMMENT,
+				notificationGroup: this.getNotificationGroup(input.commentGroup),
+				authorId: input.memberId,
+				receiverId: this.getReceiverId(input),
+				notificationTitle: 'New Comment',
+				notificationDesc: 'Someone commented on your content.',
+			});
+		} catch (error) {
+			console.error('Error in CommentService - createCommentNotification:', error.message);
+			throw new InternalServerErrorException(Message.CREATE_FAILED);
+		}
+	}
+
+
+
+	private getReceiverId(input: CommentInput): ObjectId {
+		// Logic to determine the receiver of the notification
+		// This is usually the author of the content that is being commented on
+		return input.commentRefId; // Assuming `commentRefId` refers to the content's owner
 	}
 
 	public async updateComment(memberId: ObjectId, input: CommentUpdate): Promise<Comment> {

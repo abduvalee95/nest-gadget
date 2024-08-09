@@ -7,6 +7,7 @@ import { GadgetModule } from '../gadget/gadget.module';
 import { MemberModule } from '../member/member.module';
 import { CommentResolver } from './comment.resolver';
 import { CommentService } from './comment.service';
+import { NotificationModule } from '../notification/notification.module'
 
 @Module({
 	imports: [
@@ -15,6 +16,7 @@ import { CommentService } from './comment.service';
 		MemberModule,
 		GadgetModule,
 		BoardArticleModule,
+		NotificationModule,
 	],
 	providers: [CommentService, CommentResolver],
 })

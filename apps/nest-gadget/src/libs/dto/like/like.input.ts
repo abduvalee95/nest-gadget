@@ -1,7 +1,8 @@
 import { Field, InputType } from '@nestjs/graphql';
-import { IsNotEmpty } from 'class-validator';
+import { IsEmpty, IsNotEmpty } from 'class-validator';
 import { ObjectId } from 'mongoose';
 import { LikeGroup } from '../../enums/like.enum';
+import { NotificationGroup } from '../../enums/notification.enum'
 
 @InputType()
 export class LikeInput {
@@ -16,4 +17,13 @@ export class LikeInput {
 	@IsNotEmpty()
 	@Field(() => LikeGroup)
 	likeGroup: LikeGroup;
+
+	@IsEmpty()
+	@Field(() => String)
+	notificationRefId: ObjectId
+	
+	@IsEmpty()
+	@Field(() => NotificationGroup)
+	notificationGroup: NotificationGroup; //Groupni Type 
+
 }

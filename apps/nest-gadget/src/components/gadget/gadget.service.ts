@@ -16,6 +16,9 @@ import { lookupAuthMemberLiked, lookupMember, shapeIntoMongoObjectId } from '../
 import { LikeInput } from '../../libs/dto/like/like.input'
 import { LikeGroup } from '../../libs/enums/like.enum'
 import { LikeService } from '../like/like.service'
+import { NotificationService } from '../notification/notification.service'
+import { NotificationInput } from '../../libs/dto/notification/notification.input'
+import { NotificationGroup } from '../../libs/enums/notification.enum'
 
 @Injectable()
 export class GadgetService {
@@ -59,7 +62,7 @@ export class GadgetService {
 					targetGadget.gadgetViews++;
 				}
 				//meLiked
-				const likeInput = { memberId: memberId, likeRefId: gadgetId, likeGroup: LikeGroup.GADGET };
+				const likeInput = { memberId: memberId, likeRefId: gadgetId, likeGroup: LikeGroup.GADGET,notificationGroup:NotificationGroup.GADGET,notificationRefId: null };
 				targetGadget.meLiked = await this.likeService.checkLikeExistance(likeInput);
 			}
 			targetGadget.memberData = await this.memberService.getMember(null, targetGadget.memberId);
@@ -178,11 +181,14 @@ export class GadgetService {
 			memberId: memberId,
 			likeRefId: likeRefId,
 			likeGroup: LikeGroup.GADGET,
+			notificationGroup:NotificationGroup.GADGET,
+			notificationRefId: null
 		};
 
 		//Togle
 		const modifier: number = await this.likeService.toggleLike(input);
 		const result = await this.propertyStatsEditor({ _id: likeRefId, targetKey: 'gadgetLikes', modifier: modifier });
+		// const noti:number = await this.notificationService.toggleNotification(input)
 
 		if (!result) throw new InternalServerErrorException(Message.SOMETHING_WENT_WRONG);
 		return result;
@@ -292,7 +298,7 @@ export class GadgetService {
 			// periodsRange,
 			pricesRange,
 			// gadgetDisplaySquare,
-			options,
+			// options,
 			text,
 		} = input.search;
 		if (memberId) match.memberId = shapeIntoMongoObjectId(memberId);
@@ -306,12 +312,12 @@ export class GadgetService {
 		if (gadgetDisplaySquare) match.gadgetDisplaySquare = { $gte: gadgetDisplaySquare.start, $lte: gadgetDisplaySquare.end };
  */
 		if (text) match.gadgetTitle = { $regex: new RegExp(text, 'i') };
-		if (options) {
+		/* if (options) {
 			match['$or'] = options.map((ele) => {
 				return { [ele]: true };
-			});
+			}); 
 			
-		}
+		}*/
 	}
 
 }

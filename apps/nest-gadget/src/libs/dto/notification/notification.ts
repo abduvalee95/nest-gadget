@@ -6,40 +6,19 @@ import { Member, TotalCounter } from '../member/member'
 @ObjectType()
 export class MeNotificate {
 	@Field(()=> String)
-	memberId: ObjectId; // kim uchun bosilyabti
+	memberId: ObjectId; // kim uchun bosilyabti hosil bolgan 
 
 	@Field(()=> String)
-	notificationRefId: ObjectId // kim notification yozdi yoki like bosdi
+	notificationRefId: ObjectId //qaysi groupga ketyabti poduct
 
 	@Field(() => Boolean)
-	myNotifications: boolean;
+	unRead: boolean;
 
 	@Field(() => NotificationStatus)
 	notificationStatus: NotificationStatus;
 
-	@Field(() => NotificationGroup)
+	@Field(() => NotificationGroup) // type 
 	notificationGroup: NotificationGroup;
-
-	@Field(() => String)
-	notificationTitle: string;
-
-	@Field(() => String)
-	notificationDesc: string;
-
-	@Field(() => Date)
-	createdAt: Date;
-
-	@Field(() => Date)
-	updatedAt: Date;
-
-	/** from aggregation **/
-
-	@Field(() => Member, { nullable: true })
-	memberData?: Member;
-}
-
-@ObjectType()
-export class Notificate {
 
 	@Field(() => String)
 	authorId: ObjectId;
@@ -53,18 +32,25 @@ export class Notificate {
 	@Field(() => String)
 	articleId: ObjectId;
 
+
 	@Field(() => Date)
 	createdAt: Date;
 
 	@Field(() => Date)
 	updatedAt: Date;
+	
+	/** from aggregation **/
 
+	@Field(() => Member, { nullable: true })
+	memberData?: Member;
 }
+
+
 
 @ObjectType()
 export class Notifications {
-	@Field(() => [Notification])
-	list: Notification[];
+	@Field(() => [MeNotificate])
+	list: MeNotificate[];
 
 	@Field(() => [TotalCounter], { nullable: true })
 	metaCounter: TotalCounter[];

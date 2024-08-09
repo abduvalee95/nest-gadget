@@ -18,4 +18,5 @@ export enum Message {
 	NOT_ALLOWED_REQUEST = 'Not Allowed Request!',
 	PROVIDE_ALLOWED_FORMAT = 'Please Provide JPG, JPEG or PNG format Images!',
 	SELF_SUBSCRIPTION_DENIED = 'You are trying Subscribe to Yourself, Self subscribtion is Denied!',
+	VALIDATION_FAILED = "VALIDATION_FAILED",
 }

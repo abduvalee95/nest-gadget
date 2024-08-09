@@ -9,28 +9,49 @@ import { OrdinaryInquiry } from '../../libs/dto/gadget/gadget.input'
 import { LikeGroup } from '../../libs/enums/like.enum'
 import { T } from '../../libs/types/common'
 import { lookupFavorite } from '../../libs/config'
+import { NotificationService } from '../notification/notification.service'
+import { NotificationGroup, NotificationType } from '../../libs/enums/notification.enum'
 
 @Injectable()
 export class LikeService {
- constructor(@InjectModel('Like') private readonly likeModel: Model<Like>) {}
+ constructor(@InjectModel('Like') private readonly likeModel: Model<Like>,
+				private readonly notificationService: NotificationService
+) {}
 
 
 	public async toggleLike(input: LikeInput): Promise<number> {
 		const search: T = { memberId: input.memberId, likeRefId: input.likeRefId },
 			exist = await this.likeModel.findOne(search).exec();
-
 		let modifier = 1;
 		if (exist) {
 			await this.likeModel.findOneAndDelete(search).exec();
 			modifier = -1;
 		} else {
 			try {
-				await this.likeModel.create(input); // bu natijada qoshib beradi
+				await this.likeModel.create(input); 
+				// bu natijada qoshib beradi
+				// notification hosil qilinadi  memberId, notificastionRefId,
 			} catch (error) {
 				console.log('Eror LikeTogleService', error.message);
 				throw new BadRequestException(Message.CREATE_FAILED);
 			}
 		}
+		try {
+			//@ts-ignore
+      await this.notificationService.toggleNotification(input.memberId, {
+        memberId: input.memberId,
+        notificationRefId: input.likeRefId,
+        notificationType: NotificationType.LIKE, // Define your notification types
+        notificationGroup: NotificationGroup.ARTICLE, // Assuming `likeGroup` is part of `input` or you have it elsewhere
+        authorId: input.memberId, // Assuming the liker is the author of the notification
+        receiverId: input.likeRefId, // Assuming the owner of the liked content is the receiver
+        notificationTitle: `Your content was ${exist ? 'unliked' : 'liked'}`,
+        notificationDesc: exist ? 'Someone unliked your content' : 'Someone liked your content',
+      });
+    } catch (error) {
+      console.error('Error in LikeService - notificationService:', error.message);
+      throw new BadRequestException(Message.CREATE_FAILED);
+    }
 		return modifier;
 	}
 

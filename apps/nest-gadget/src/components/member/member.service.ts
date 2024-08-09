@@ -105,7 +105,7 @@ export class MemberService {
 			}
 
 			//* meLiked
-			const likeInput = { memberId: memberId, likeRefId: targetId, likeGroup: LikeGroup.MEMBER };
+			const likeInput = { memberId: memberId, likeRefId: targetId, likeGroup: LikeGroup.MEMBER, notificationRefId:null, notificationGroup: null }; //!
 			targetMember.meLiked = await this.likeService.checkLikeExistance(likeInput);
 
 			//* meFolloweed
@@ -169,6 +169,9 @@ export class MemberService {
 			memberId: memberId,
 			likeRefId: likeRefId,
 			likeGroup: LikeGroup.MEMBER,
+			//!
+			notificationRefId:null,
+			notificationGroup: null
 		};
 
 		//Togle

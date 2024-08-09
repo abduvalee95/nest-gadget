@@ -15,6 +15,7 @@ import { Direction } from '../../libs/enums/member.enum'
 import { lookupAuthMemberLiked, lookupMember, shapeIntoMongoObjectId } from '../../libs/config'
 import { LikeService } from '../like/like.service'
 import { LikeInput } from '../../libs/dto/like/like.input'
+import { NotificationGroup } from '../../libs/enums/notification.enum'
 
 @Injectable()
 export class BoardArticleService {
@@ -57,7 +58,7 @@ public async getBoardArticle(memberId: ObjectId, articleId: ObjectId): Promise<B
 			targetBoardArticle.articleViews++;
 		}
 		//meLiked
-		const likeInput = { memberId: memberId, likeRefId: articleId, likeGroup: LikeGroup.ARTICLE };
+		const likeInput = { memberId: memberId, likeRefId: articleId, likeGroup: LikeGroup.ARTICLE, notificationRefId:null, notificationGroup: null }; //!
 		targetBoardArticle.meLiked = await this.likeService.checkLikeExistance(likeInput);
 	}
 	targetBoardArticle.memberData = await this.memberService.getMember(null, targetBoardArticle.memberId);
@@ -144,6 +145,9 @@ public async getBoardArticles(memberId: ObjectId, input: BoardArticlesInquiry): 
 			memberId: memberId,
 			likeRefId: likeRefId,
 			likeGroup: LikeGroup.ARTICLE,
+			//!
+			notificationRefId:null,
+			notificationGroup: null
 		};
 
 		//Togle
