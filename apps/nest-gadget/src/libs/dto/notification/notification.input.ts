@@ -52,6 +52,9 @@ export class NotificationInput {
 	@Field(() => String)
 	articleId: ObjectId;
 
+	@Field(() => Date)
+	createdAt: Date;
 
-
+	@Field(() => Date)
+	updatedAt: Date;
 }

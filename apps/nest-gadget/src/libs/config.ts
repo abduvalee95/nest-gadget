@@ -161,6 +161,42 @@ export const lookupAuthMemberLiked = (memberId: T, targerRefId: string = '$_id')
 };
 
 
+/* // *******************************************************************
+	!																			LookupNotification
+	* ***********************************************************************/
+export const lookupNotification = (authorId: T, receiverId: string = '$_id') => {
+	return {
+		$lookup: {
+			from: 'notifications', // qaysi collectiondan izlasin
+			let: {
+				//search mehanizmga Vasriablelar
+				localReceiverId: receiverId, // '$_id'
+				localAuthorId: authorId, //member
+				localMyNotifications: true, //fronenda foyda beradi
+			},
+			pipeline: [
+				{
+					$match: {
+						$expr: {
+							$and: [{ $eq: ['$receiverId', '$$localReceiverId'] }, { $eq: ['$authorId', '$$localAuthorId'] }], //Solishtirish mantigi  Eq 'nimalarni solishtirishimizni kochirib olamiz'
+						},
+					},
+				},
+				{
+					$project: {
+						_id: 0,
+						receiverId: 1,
+						authorId: 1,
+						myNotifications: '$$localMyNotifications', // togridan togri true qilmadik agar shu mantiq togri ishlasa deb belgilab oldik
+					},
+				},
+			],
+			as: 'meNotificated', // qanday nom bilan saqlashlik
+		},
+	};
+};
+
+
 	/* // *******************************************************************
 	!																			SHAPENG 
 	* ***********************************************************************/
