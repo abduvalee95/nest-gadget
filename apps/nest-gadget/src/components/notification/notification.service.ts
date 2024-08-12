@@ -73,7 +73,7 @@ export class NotificationService {
 			}
 		])
 
-		return;
+		return null
 	}
 
 	/* // *******************************************************************

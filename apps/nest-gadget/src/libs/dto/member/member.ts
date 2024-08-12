@@ -84,6 +84,9 @@ export class Member {
 	@Field(() => String, { nullable: true })
 	accessToken?: string;
 
+	@Field(() => String, { nullable: true })
+	notifications?: string;
+
 	//* From Agregation
 
 	@Field(() => [MeLiked], { nullable: true })

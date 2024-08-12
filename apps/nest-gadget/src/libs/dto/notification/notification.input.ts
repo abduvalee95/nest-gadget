@@ -7,36 +7,36 @@ import { LikeGroup } from '../../enums/like.enum'
 @InputType()
 export class NotificationInput {
 
-	@IsNotEmpty()
-	@Field(() => String)
+	// @IsNotEmpty()
+	@Field(() => String, { nullable : true})
 	notificationTitle: string;
 
-	@IsNotEmpty()
-	@Field(() => String)
+	// @IsNotEmpty()
+	@Field(() => String, { nullable : true})
 	notificationDesc: string;
 
 	@IsNotEmpty()
 	@Field(() => String)
 	memberId: ObjectId;
 
-	@IsNotEmpty()
+	// @IsNotEmpty()
 	@Field(() => String)
 	notificationRefId: ObjectId
 	
-	@IsNotEmpty()
-	@Field(() => NotificationGroup)
+	// @IsNotEmpty()
+	@Field(() => NotificationGroup , { nullable : true})
 	notificationGroup: NotificationGroup; //Groupni Type 
 
-	@IsNotEmpty()
-	@Field(() => NotificationType)
+	// @IsNotEmpty()
+	@Field(() => NotificationType, { nullable : true})
 	notificationType: NotificationType; //Groupni Type 
 
-	@IsNotEmpty()
-	@Field(() => String)
+	// @IsNotEmpty()
+	@Field(() => String, { nullable : true})
 	likeRefId: ObjectId;
 
-	@IsNotEmpty()
-	@Field(() => LikeGroup)
+	// @IsNotEmpty()
+	@Field(() => LikeGroup, { nullable : true})
 	likeGroup: LikeGroup;
 
 
