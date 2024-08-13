@@ -1,5 +1,5 @@
 import { Field, InputType } from '@nestjs/graphql';
-import { IsNotEmpty } from 'class-validator';
+import { IsNotEmpty, IsOptional } from 'class-validator';
 import { NotificationGroup, NotificationType } from '../../enums/notification.enum';
 import { ObjectId } from 'mongoose'
 import { LikeGroup } from '../../enums/like.enum'
@@ -7,11 +7,12 @@ import { LikeGroup } from '../../enums/like.enum'
 @InputType()
 export class NotificationInput {
 
-	// @IsNotEmpty()
+	@IsOptional()
 	@Field(() => String, { nullable : true})
 	notificationTitle: string;
 
 	// @IsNotEmpty()
+	@IsOptional()
 	@Field(() => String, { nullable : true})
 	notificationDesc: string;
 
@@ -20,41 +21,51 @@ export class NotificationInput {
 	memberId: ObjectId;
 
 	// @IsNotEmpty()
-	@Field(() => String)
+	@IsOptional()
+	@Field(() => String, { nullable : true})
 	notificationRefId: ObjectId
 	
 	// @IsNotEmpty()
+	@IsOptional()
 	@Field(() => NotificationGroup , { nullable : true})
 	notificationGroup: NotificationGroup; //Groupni Type 
 
 	// @IsNotEmpty()
+	@IsOptional()
 	@Field(() => NotificationType, { nullable : true})
 	notificationType: NotificationType; //Groupni Type 
 
 	// @IsNotEmpty()
+	@IsOptional()
 	@Field(() => String, { nullable : true})
 	likeRefId: ObjectId;
 
 	// @IsNotEmpty()
+	@IsOptional()
 	@Field(() => LikeGroup, { nullable : true})
 	likeGroup: LikeGroup;
 
-
-	@Field(() => String)
+	@IsOptional()
+	@Field(() => String, { nullable : true})
 	authorId: ObjectId;
 
-	@Field(() => String)
+	@IsOptional()
+	@Field(() => String, { nullable : true})
 	receiverId: ObjectId;
 
-	@Field(() => String)
+	@IsOptional()
+	@Field(() => String, { nullable : true})
 	gadgetId: ObjectId;
 
-	@Field(() => String)
+	@IsOptional()
+	@Field(() => String, { nullable : true})
 	articleId: ObjectId;
 
-	@Field(() => Date)
+	@IsOptional()
+	@Field(() => Date, { nullable : true})
 	createdAt: Date;
 
-	@Field(() => Date)
+	@IsOptional()
+	@Field(() => Date, { nullable : true})
 	updatedAt: Date;
 }

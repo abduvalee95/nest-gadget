@@ -3,6 +3,7 @@ import { MongooseModule } from '@nestjs/mongoose';
 import LikeSchema from '../../schemas/Like.model';
 import { LikeService } from './like.service';
 import { NotificationModule } from '../notification/notification.module'
+import MemberSchema from '../../schemas/Member.model'
 
 @Module({
 	imports: [
@@ -10,6 +11,13 @@ import { NotificationModule } from '../notification/notification.module'
 			{
 				name: 'Like',
 				schema: LikeSchema,
+			},
+			
+		]),
+		MongooseModule.forFeature([
+			{
+				name: 'Member',
+				schema: MemberSchema,
 			},
 		]),
 		NotificationModule,

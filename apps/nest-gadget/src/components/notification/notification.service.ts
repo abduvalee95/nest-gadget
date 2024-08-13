@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable, InternalServerErrorException } from '@nestjs/common';
+import { BadRequestException, ConsoleLogger, Injectable, InternalServerErrorException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model, ObjectId } from 'mongoose';
 import { MeNotificate } from '../../libs/dto/notification/notification';
@@ -14,18 +14,6 @@ export class NotificationService {
 	constructor(@InjectModel('Notification') private readonly notificationModel: Model<MeNotificate>) {}
 
 	public async toggleNotification(memberId: ObjectId, input: NotificationInput): Promise<number> {
-		/* 	const search: T = { memberId:input.memberId, notificationRefId: input.notificationRefId };
-		memberId = input.memberId
-		// exist = await this.notificationModel.findOne(search).exec();
-		let modifier = 1
-		try {
-			console.log("here")
-		 	await this.notificationModel.create(input);
-			modifier ++
-		} catch (error) {
-			console.log('Error CreateNotificationServiceModel', error.message);
-			throw new BadRequestException(Message.CREATE_FAILED);
-		} */
 		const search: T = { memberId: input.memberId, notificationRefId: input.notificationRefId };
 		let modifier = 1;
 
@@ -56,8 +44,9 @@ export class NotificationService {
 	public async getNotification(authorId: ObjectId, input: NotificationInput): Promise<MeNotificate> {
 		const { notificationRefId } = input;
 		const match: T = { notificationRefId: notificationRefId, notificationStatus: NotificationStatus.WAIT };
-		// keyn 	const sort: T = { [input?.sort ?? 'createdAt']: input?.direction ?? Direction.DESC };
-
+		// const sort: T = { [input?.sort ?? 'createdAt']: input?.direction ?? Direction.DESC };
+		console.log("here", authorId)
+		console.log(match)
 		const result: MeNotificate[] = await this.notificationModel
 		.aggregate([
 			{$match: match},
@@ -72,8 +61,9 @@ export class NotificationService {
 				}
 			}
 		])
-
-		return null
+		if (!result.length) throw new InternalServerErrorException(Message.NO_DATA_FOUND);
+		console.log(result)
+		return result[0];
 	}
 
 	/* // *******************************************************************

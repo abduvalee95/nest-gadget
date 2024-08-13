@@ -2,7 +2,7 @@ import { ObjectId } from 'bson';
 import * as path from 'path';
 import { v4 as uuidv4 } from 'uuid';
 import { T } from './types/common';
-
+import { log } from 'console'
 
 /* // *******************************************************************
 	!																			IMAGE 
@@ -21,7 +21,7 @@ export const availbleAgentSorts = ['createdAt', 'updatedAt', 'memberLikes', 'mem
 export const availbleMemberSorts = ['createdAt', 'updatedAt', 'memberLikes', 'memberViews'];
 
 export const availableOptions = ['gadgetUsed', 'gadgetNew'];
-export const availableMemory = [64,128,256,512,1];
+export const availableMemory = [64, 128, 256, 512, 1];
 
 export const availableGadgetSorts = [
 	'createdAt',
@@ -42,6 +42,15 @@ export const availableCommentSorts = ['createdAt', 'updatedAt'];
 export const lookupMember = {
 	$lookup: {
 		from: 'members',
+		localField: 'memberId',
+		foreignField: '_id',
+		as: 'memberData',
+	},
+};
+
+export const lookupNotice = {
+	$lookup: {
+		from: 'notices',
 		localField: 'memberId',
 		foreignField: '_id',
 		as: 'memberData',
@@ -69,13 +78,13 @@ export const lookupFavorite = {
 /* // *******************************************************************
 	!																			LookupAuthMemberFollow 
 	* ***********************************************************************/
-interface lookupAuthMemberFollowed{
+interface lookupAuthMemberFollowed {
 	followerId: T;
 	followingId: string;
 }
 
 export const lookupAuthMemberFollowed = (input: lookupAuthMemberFollowed) => {
-	const {followerId,followingId} = input
+	const { followerId, followingId } = input;
 	return {
 		$lookup: {
 			from: 'follows', // qaysi collectiondan izlasin
@@ -160,11 +169,12 @@ export const lookupAuthMemberLiked = (memberId: T, targerRefId: string = '$_id')
 	};
 };
 
-
 /* // *******************************************************************
 	!																			LookupNotification
 	* ***********************************************************************/
 export const lookupNotification = (authorId: T, receiverId: string = '$_id') => {
+	console.log("lookUpNotification ", authorId)
+	console.log("lookUpNotification ", receiverId)
 	return {
 		$lookup: {
 			from: 'notifications', // qaysi collectiondan izlasin
@@ -178,7 +188,10 @@ export const lookupNotification = (authorId: T, receiverId: string = '$_id') => 
 				{
 					$match: {
 						$expr: {
-							$and: [{ $eq: ['$receiverId', '$$localReceiverId'] }, { $eq: ['$authorId', '$$localAuthorId'] }], //Solishtirish mantigi  Eq 'nimalarni solishtirishimizni kochirib olamiz'
+							$and: [
+								{ $eq: ['$receiverId', '$$localReceiverId'] },
+								{ $eq: ['$authorId', '$$localAuthorId'] }
+										], //Solishtirish mantigi  Eq 'nimalarni solishtirishimizni kochirib olamiz'
 						},
 					},
 				},
@@ -196,11 +209,9 @@ export const lookupNotification = (authorId: T, receiverId: string = '$_id') => 
 	};
 };
 
-
-	/* // *******************************************************************
+/* // *******************************************************************
 	!																			SHAPENG 
 	* ***********************************************************************/
 export const shapeIntoMongoObjectId = (target: any) => {
 	return typeof target === 'string' ? new ObjectId(target) : target;
 };
-

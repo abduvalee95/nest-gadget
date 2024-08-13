@@ -8,12 +8,12 @@ import { CommentUpdate } from '../../libs/dto/comment/comment.update';
 import { CommentGroup, CommentStatus } from '../../libs/enums/comment.enum';
 import { Message } from '../../libs/enums/common.enums';
 import { Direction } from '../../libs/enums/member.enum';
+import { NotificationGroup, NotificationType } from '../../libs/enums/notification.enum';
 import { T } from '../../libs/types/common';
 import { BoardArticleService } from '../board-article/board-article.service';
 import { GadgetService } from '../gadget/gadget.service';
 import { MemberService } from '../member/member.service';
-import { NotificationService } from '../notification/notification.service'
-import { NotificationGroup, NotificationType } from '../../libs/enums/notification.enum'
+import { NotificationService } from '../notification/notification.service';
 
 @Injectable()
 export class CommentService {
@@ -30,7 +30,7 @@ export class CommentService {
 		let result = null;
 		try {
 			result = await this.commentModule.create(input);
-			// Comment hosil bolganda Notification hosil qilamiz Serivise iwledi  
+			// Comment hosil bolganda Notification hosil qilamiz Serivise iwledi
 		} catch (error) {
 			console.log('Error CreateCommentServiceModel', error.message);
 			throw new BadRequestException(Message.CREATE_FAILED);
@@ -59,7 +59,8 @@ export class CommentService {
 				});
 				break;
 		}
-		await this.createCommentNotification(input,result)
+		await this.createCommentNotification(input, result);
+		await this.memberService.memberStatsEditor({ _id: input.commentRefId, targetKey: 'notifications', modifier: 1 });
 		if (!result) throw new InternalServerErrorException(Message.CREATE_FAILED);
 		return result;
 	}
@@ -95,8 +96,6 @@ export class CommentService {
 			throw new InternalServerErrorException(Message.CREATE_FAILED);
 		}
 	}
-
-
 
 	private getReceiverId(input: CommentInput): ObjectId {
 		// Logic to determine the receiver of the notification

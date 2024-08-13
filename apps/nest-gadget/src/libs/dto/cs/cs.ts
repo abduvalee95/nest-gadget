@@ -35,8 +35,8 @@ export class Notice {
 
 @ObjectType()
 export class Notices {
-	@Field(() => [Notices])
-	list: Notices[];
+	@Field(() => [Notice])
+	list: Notice[];
 
 	@Field(() => [TotalCounter], { nullable: true })
 	metaCounter: TotalCounter[];

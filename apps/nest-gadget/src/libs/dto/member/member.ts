@@ -84,8 +84,8 @@ export class Member {
 	@Field(() => String, { nullable: true })
 	accessToken?: string;
 
-	@Field(() => String, { nullable: true })
-	notifications?: string;
+	@Field(() => Number, { nullable: true })
+	notifications?: number;
 
 	//* From Agregation
 

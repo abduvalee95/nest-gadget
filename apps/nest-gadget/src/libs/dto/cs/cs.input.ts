@@ -2,7 +2,7 @@ import { Field, InputType, Int } from '@nestjs/graphql'
 import { IsIn, IsNotEmpty, IsOptional, Length, Min } from 'class-validator'
 import { NoticeCategory } from '../../enums/notice.enum'
 import { ObjectId } from 'mongoose'
-import { availableCommentSorts } from '../../config'
+import { availableBoardArticleSorts, availableCommentSorts } from '../../config'
 import { Direction } from '../../enums/member.enum'
 
 @InputType()
@@ -24,16 +24,15 @@ export class CsInput {
 	memberId?: ObjectId;
 
 }
-
 @InputType()
-class CISearch {
-	@IsNotEmpty()
+class CsISearch {
+	@IsOptional()
 	@Field(() => String)
 	noticeRefId: ObjectId;
 }
 
 @InputType()
-export class CsInquiry {
+export class NoticesInquiry {
 	@IsNotEmpty()
 	@Min(1)
 	@Field(() => Int)
@@ -45,7 +44,7 @@ export class CsInquiry {
 	limit: number;
 
 	@IsOptional()
-	@IsIn(availableCommentSorts)
+	@IsIn(availableBoardArticleSorts)
 	@Field(() => String, { nullable: true })
 	sort?: string;
 
@@ -54,6 +53,7 @@ export class CsInquiry {
 	direction?: Direction;
 
 	@IsNotEmpty()
-	@Field(() => CISearch)
-	search: CISearch;
+	@Field(() => CsISearch)
+	search: CsISearch;
 }
+
