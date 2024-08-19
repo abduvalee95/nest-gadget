@@ -6,7 +6,8 @@ import { NotificationInput } from '../../libs/dto/notification/notification.inpu
 import { Message } from '../../libs/enums/common.enums';
 import { NotificationStatus } from '../../libs/enums/notification.enum';
 import { StatisticModifier, T } from '../../libs/types/common';
-import { lookupNotification } from '../../libs/config'
+import { lookupNotification, lookupNotificationData } from '../../libs/config'
+import { NotificationUpdate } from '../../libs/dto/notification/notification.update'
 
 @Injectable()
 export class NotificationService {
@@ -41,31 +42,26 @@ export class NotificationService {
 		return modifier;
 	}
 
-	public async getNotification(authorId: ObjectId, input: NotificationInput): Promise<MeNotificate> {
-		const { notificationRefId } = input;
-		const match: T = { notificationRefId: notificationRefId, notificationStatus: NotificationStatus.WAIT };
+	public async getNotification(memberId: ObjectId,input:String
+	): Promise<MeNotificate[]> {
+		const match: T = {receiverId:memberId , notificationStatus: NotificationStatus.WAIT };
 		// const sort: T = { [input?.sort ?? 'createdAt']: input?.direction ?? Direction.DESC };
-		console.log("here", authorId)
-		console.log(match)
-		const result: MeNotificate[] = await this.notificationModel
+		const result = await this.notificationModel
 		.aggregate([
 			{$match: match},
-			{
-				$facet:{
-					list:[
-						// { $skip: (input.page - 1) * input.limit },
-							// {$limit: input.}
-							lookupNotification(authorId),
-							{ $unwind: '$memberData' },
-					]
-				}
-			}
-		])
-		if (!result.length) throw new InternalServerErrorException(Message.NO_DATA_FOUND);
-		console.log(result)
-		return result[0];
+			lookupNotificationData,
+		]).exec()
+		if (!result) throw new InternalServerErrorException(Message.NO_DATA_FOUND);
+		// console.log(JSON.stringify(result,null,5))
+		return result
 	}
 
+	public async updateNotification(authorId: ObjectId, input: NotificationUpdate): Promise<MeNotificate> {
+		const { _id } = input;
+		const result = await this.notificationModel.findOneAndUpdate({ _id: _id }, input, { new: true }).exec();
+		if (!result) throw new InternalServerErrorException(Message.UPDATE_FALED);
+		return result;
+	}
 	/* // *******************************************************************
 																					Stats Editor
 	* ***********************************************************************/

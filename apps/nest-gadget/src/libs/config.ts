@@ -124,6 +124,15 @@ export const lookupFollowingData = {
 		as: 'followingData', //shundoq save qiladi
 	},
 };
+export const lookupNotificationData = {
+	$lookup: {
+		// notificationdi ichidan 
+		from: 'members', //uni shu collectiondan
+		localField: 'receiverId',
+		foreignField: '_id', //shu nom bilan izledi
+		as: 'notificationData', //shundoq save qiladi
+	},
+};
 
 export const lookupFollowerData = {
 	$lookup: {

@@ -115,8 +115,8 @@ class PISearch {
 	typeList?: GadgetType[];
 
 	@IsOptional()
-	@Field(() => [Int], { nullable: true })
-	gadgetCapacityList?: Number[];
+	@Field(() => [Number], { nullable: true })
+	capacityList?: Number[];
 
 	@IsOptional()
 	@Field(() => [Int], { nullable: true })

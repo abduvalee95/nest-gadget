@@ -27,8 +27,8 @@ export class CsInput {
 @InputType()
 class CsISearch {
 	@IsOptional()
-	@Field(() => String)
-	noticeRefId: ObjectId;
+	@Field(() => NoticeCategory,{nullable: true})
+	noticeCategory: NoticeCategory;
 }
 
 @InputType()

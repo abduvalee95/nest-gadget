@@ -10,7 +10,6 @@ export const AuthMember = createParamDecorator((data: string, context: Execution
 	} else request = context.switchToHttp().getRequest();
 
 	const member = request.body.authMember;
-
 	if (member) return data ? member?.[data] : member;
 	else return null;
 });

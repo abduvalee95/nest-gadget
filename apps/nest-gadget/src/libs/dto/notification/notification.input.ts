@@ -16,8 +16,8 @@ export class NotificationInput {
 	@Field(() => String, { nullable : true})
 	notificationDesc: string;
 
-	@IsNotEmpty()
-	@Field(() => String)
+	@IsOptional()
+	@Field(() => String, { nullable : true})
 	memberId: ObjectId;
 
 	// @IsNotEmpty()

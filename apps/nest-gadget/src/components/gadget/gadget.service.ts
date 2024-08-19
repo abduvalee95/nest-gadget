@@ -292,7 +292,7 @@ export class GadgetService {
 		const {
 			memberId,
 			locationList,
-			gadgetCapacityList,
+			capacityList,
 			gadgetWeight,
 			typeList,
 			// periodsRange,
@@ -303,7 +303,7 @@ export class GadgetService {
 		} = input.search;
 		if (memberId) match.memberId = shapeIntoMongoObjectId(memberId);
 		if (locationList && locationList.length) match.gadgetLocation = { $in: locationList };
-		if (gadgetCapacityList && gadgetCapacityList.length) match.gadgetCapacity = { $in: gadgetCapacityList };
+		if (capacityList && capacityList.length) match.gadgetCapacity = { $in: capacityList };
 		if (gadgetWeight && gadgetWeight.length) match.gadgetWeight = { $in: gadgetWeight };
 		if (typeList && typeList.length) match.gadgetType = { $in: typeList };
 

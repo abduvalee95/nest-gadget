@@ -1,57 +1,43 @@
-import { Field, ObjectType } from '@nestjs/graphql'
-import { ObjectId } from 'mongoose'
-import { NotificationGroup, NotificationStatus } from '../../enums/notification.enum'
-import { Member, TotalCounter } from '../member/member' 
+import { Field, ObjectType } from '@nestjs/graphql';
+import { ObjectId } from 'mongoose';
+import { NotificationGroup, NotificationStatus } from '../../enums/notification.enum';
+import { Member, TotalCounter } from '../member/member';
 
 @ObjectType()
 export class MeNotificate {
-	@Field(()=> String)
-	memberId: ObjectId; // kim uchun bosilyabti hosil bolgan 
 
-	@Field(()=> String)
-	notificationRefId: ObjectId //qaysi groupga ketyabti poduct
+	@Field(() => String, { nullable: true })
+	memberId: ObjectId; // kim uchun bosilyabti hosil bolgan
 
-	@Field(() => Boolean)
+	@Field(() => String, { nullable: true })
+	notificationRefId: ObjectId; //qaysi groupga ketyabti poduct
+
+	@Field(() => Boolean, { nullable: true })
 	unRead: boolean;
 
-	@Field(() => NotificationStatus)
+	@Field(() => NotificationStatus, { nullable: true })
 	notificationStatus: NotificationStatus;
 
-	@Field(() => NotificationGroup) // type 
+	@Field(() => NotificationGroup, { nullable: true }) // type
 	notificationGroup: NotificationGroup;
 
-	@Field(() => String)
+	@Field(() => String, { nullable: true })
 	authorId: ObjectId;
 
-	@Field(() => String)
+	@Field(() => String, { nullable: true })
 	receiverId: ObjectId;
 
-	@Field(() => String)
+	@Field(() => String, { nullable: true })
 	gadgetId: ObjectId;
 
-	@Field(() => String)
+	@Field(() => String, { nullable: true })
 	articleId: ObjectId;
-
 
 	@Field(() => Date)
 	createdAt: Date;
 
 	@Field(() => Date)
 	updatedAt: Date;
-	
-	/** from aggregation **/
-
-	@Field(() => Member, { nullable: true })
-	memberData?: Member;
 }
 
 
-
-@ObjectType()
-export class Notifications {
-	@Field(() => [MeNotificate])
-	list: MeNotificate[];
-
-	@Field(() => [TotalCounter], { nullable: true })
-	metaCounter: TotalCounter[];
-}
