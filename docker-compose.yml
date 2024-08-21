@@ -6,14 +6,14 @@ services:
     restart: always
     image: node:20.10.0
     ports:
-          5001:3007
+         - 5001:3007
     volumes:
            - ./:/usr/src/gadget
     working_dir: 
             /usr/src/gadget
 
     networks:
-           -  monorepo-network
+           - monorepo-network
 
     command: bash -c "npm install && npm run build && npm run start:prod"
     # Gadget Batch
@@ -22,20 +22,28 @@ services:
     restart: always
     image: node:20.10.0
     ports:
-          5002:3008
+         - 5002:3008
     volumes:
            - ./:/usr/src/gadget
     working_dir: 
             /usr/src/gadget
 
     networks:
-           -  monorepo-network
+           - monorepo-network
 
     command: bash -c "npm install && npm run build && npm run start:prod:batch"
 
-    networks:
-     monorepo-network:
-      driver: bridge
+networks:
+  monorepo-network:
+    driver: bridge
+
+
+
+
+
+
+
+
 
       # next- LocalHost 5000: - container 3000
       # nest -LocalHost 5001: - container 3007
