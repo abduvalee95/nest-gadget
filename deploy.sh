@@ -1,6 +1,6 @@
-#!/bin/bash
+#!/bin/bash 
 
-#PRODUCTION
+#PRODUCTION  chmod +x ./deploy.sh
 git reset --hard
 git checkout master
 git pull origin master
