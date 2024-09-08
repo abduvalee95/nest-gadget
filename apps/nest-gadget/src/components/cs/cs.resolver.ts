@@ -38,14 +38,14 @@ return await this.csService.getNotices(input)
 
 @Roles(MemberType.ADMIN)
 @UseGuards(RolesGuard)
-@Mutation((returns) => Notices)
+@Mutation((returns) => Notice)
 public async removeNotice(
 	@Args('articleId') input: string,
 	@AuthMember('_id') memberId: ObjectId,
-): Promise<Notices> {
+): Promise<Notice> {
 	console.log('Mutation:> AdminUpdateBoardArticle');
 	const noticeId = shapeIntoMongoObjectId(input);
-	return await this.csService.getNotices(noticeId)
+	return await this.csService.removeNotice(noticeId)
 
 }
 }

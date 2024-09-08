@@ -1,6 +1,6 @@
 import { Field, InputType, Int } from '@nestjs/graphql'
 import { IsIn, IsNotEmpty, IsOptional, Length, Min } from 'class-validator'
-import { NoticeCategory } from '../../enums/notice.enum'
+import { NoticeCategory, NoticeStatus } from '../../enums/notice.enum'
 import { ObjectId } from 'mongoose'
 import { availableBoardArticleSorts, availableCommentSorts } from '../../config'
 import { Direction } from '../../enums/member.enum'
@@ -29,6 +29,15 @@ class CsISearch {
 	@IsOptional()
 	@Field(() => NoticeCategory,{nullable: true})
 	noticeCategory: NoticeCategory;
+
+	@IsOptional()
+	@Field(() => NoticeStatus, { nullable: true })
+	noticeStatus?: NoticeStatus;
+	
+	@IsOptional()
+	@Field(() => String, { nullable: true })
+	text?: string;
+
 }
 
 @InputType()

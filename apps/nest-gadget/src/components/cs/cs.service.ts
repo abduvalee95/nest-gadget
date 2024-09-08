@@ -7,6 +7,7 @@ import { Message } from '../../libs/enums/common.enums';
 import { Direction } from '../../libs/enums/member.enum';
 import { NoticeStatus } from '../../libs/enums/notice.enum';
 import { T } from '../../libs/types/common';
+import { lookupMember } from '../../libs/config'
 
 @Injectable()
 export class CsService {
@@ -27,9 +28,11 @@ export class CsService {
 	}
 
 	public async getNotices(input: NoticesInquiry): Promise<Notices> {
-		const { noticeCategory } = input.search;
-		const match: T = { noticeStatus: NoticeStatus.ACTIVE, noticeCategory  };
+		const { noticeStatus, text } = input.search;
+		const match: T = { ...(input.search?.noticeCategory && { noticeCategory: input.search?.noticeCategory }) };
 		const sort: T = { [input?.sort ?? 'createdAt']: input?.direction ?? Direction.DESC };
+		if (text) match.noticeTitle = { $regex: new RegExp(text, 'i') };
+		if (noticeStatus) match.noticeStatus = noticeStatus;
 		console.log('match', match);
 
 		const result = await this.csModel
@@ -41,8 +44,8 @@ export class CsService {
 						list: [
 							{ $skip: (input.page - 1) * input.limit },
 							{ $limit: input.limit },
- 
-							// { $unwind: '$memberData' },
+							lookupMember,
+							{ $unwind: '$memberData' },
 						],
 						metaCounter: [{ $count: 'total' }],
 					},
@@ -54,7 +57,7 @@ export class CsService {
 		return result[0];
 	}
 
-	public async removeBoardArticleByAdmin(noticeId: ObjectId): Promise<Notice> {
+	public async removeNotice(noticeId: ObjectId): Promise<Notice> {
 		const search: T = { _id: noticeId };
 		const result = await this.csModel.findOneAndDelete(search).exec();
 
