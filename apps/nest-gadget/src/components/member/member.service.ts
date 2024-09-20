@@ -16,6 +16,8 @@ import { LikeGroup } from '../../libs/enums/like.enum'
 import { LikeService } from '../like/like.service'
 import { Follower, Following, MeFollowed } from '../../libs/dto/follow/follow'
 import { lookupAuthMemberLiked } from '../../libs/config'
+import { NotificationService } from '../notification/notification.service'
+import { NotificationGroup, NotificationType } from '../../libs/enums/notification.enum'
 
 @Injectable()
 export class MemberService {
@@ -27,6 +29,7 @@ export class MemberService {
 		private readonly authService: AuthService,
 		private readonly viewService: ViewService,
 		private readonly likeService: LikeService,
+		private notificationService: NotificationService,
 	) {}
 
 	public async signup(input: MemberInput): Promise<Member> {
@@ -162,6 +165,7 @@ export class MemberService {
 	* ***********************************************************************/
 	public async likeTargetMember(memberId: ObjectId, likeRefId: ObjectId): Promise<Member> {
 		//variable ochamiz va izlemiz id :refId sini memberStatus.Active bolish kk
+		const member = await this.memberModel.findById(memberId).exec()
 		const target: Member = await this.memberModel.findOne({ _id: likeRefId, memberStatus: MemberStatus.ACTIVE }).exec();
 		if (!target) throw new InternalServerErrorException(Message.NO_DATA_FOUND);
 
@@ -179,6 +183,17 @@ export class MemberService {
 		const result = await this.memberStatsEditor({ _id: likeRefId, targetKey: 'memberLikes', modifier: modifier }); //bu oshirib beryabti
 
 		if (!result) throw new InternalServerErrorException(Message.SOMETHING_WENT_WRONG);
+		if (modifier > 0) {
+			// Assuming modifier > 0 means a like was added
+			await this.notificationService.createNotification(memberId, {
+				notificationType: NotificationType.LIKE,
+				notificationGroup: NotificationGroup.MEMBER,
+				notificationTitle: 'New Like',
+				notificationDesc: `${member.memberNick} liked you!`,
+				authorId: memberId,
+				receiverId: likeRefId,
+			});
+		}
 		return result;
 	}
 

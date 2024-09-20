@@ -2,9 +2,12 @@ import { BadRequestException, Injectable, InternalServerErrorException } from '@
 import { InjectModel } from '@nestjs/mongoose';
 import { Model, ObjectId } from 'mongoose';
 import { lookupMember } from '../../libs/config';
+import { BoardArticle } from '../../libs/dto/board-article/board-article';
 import { Comment, Comments } from '../../libs/dto/comment/comment';
 import { CommentInput, CommentsInquiry } from '../../libs/dto/comment/comment.input';
 import { CommentUpdate } from '../../libs/dto/comment/comment.update';
+import { Gadget } from '../../libs/dto/gadget/gadget';
+import { Member } from '../../libs/dto/member/member';
 import { CommentGroup, CommentStatus } from '../../libs/enums/comment.enum';
 import { Message } from '../../libs/enums/common.enums';
 import { Direction } from '../../libs/enums/member.enum';
@@ -19,6 +22,9 @@ import { NotificationService } from '../notification/notification.service';
 export class CommentService {
 	constructor(
 		@InjectModel('Comment') private readonly commentModule: Model<Comment>,
+		@InjectModel('Gadget') private readonly gadgetModel: Model<Gadget>,
+		@InjectModel('BoardArticle') private readonly boardArticleModel: Model<BoardArticle>,
+		@InjectModel('Member') private readonly memberModel: Model<Member>,
 		private readonly memberService: MemberService,
 		private readonly gadgetService: GadgetService,
 		private readonly boardArticleService: BoardArticleService,
@@ -26,6 +32,7 @@ export class CommentService {
 	) {}
 
 	public async createComment(memberId: ObjectId, input: CommentInput): Promise<Comment> {
+		const member = await this.memberModel.findById(memberId).exec();
 		input.memberId = memberId;
 		let result = null;
 		try {
@@ -38,18 +45,45 @@ export class CommentService {
 
 		switch (input.commentGroup) {
 			case CommentGroup.GADGET:
+				const gadget = await this.gadgetModel.findById(input.commentRefId);
+				if (!gadget) throw new InternalServerErrorException('Gadget not found');
 				await this.gadgetService.propertyStatsEditor({
 					_id: input.commentRefId,
 					targetKey: 'gadgetComments',
 					modifier: 1,
 				});
+
+				// 1-------------Notification-----propertyComments---------
+				await this.notificationService.createNotification(memberId, {
+					notificationType: NotificationType.COMMENT,
+					notificationGroup: NotificationGroup.GADGET,
+					notificationTitle: 'New Comment for your Gadget!',
+					notificationDesc: `${member.memberNick} commented to your Gadget!`,
+					authorId: memberId,
+					receiverId: gadget.memberId,
+					gadgetId: input.commentRefId,
+					articleId: undefined,
+				});
 				break;
 			case CommentGroup.ARTICLE:
+				const article = await this.boardArticleModel.findById(input.commentRefId);
+				if (!article) throw new InternalServerErrorException('Article not found');
 				await this.boardArticleService.boardArticleStateEditor({
 					_id: input.commentRefId,
 					targetKey: 'articleComments',
 					modifier: 1,
 				});
+					// 2-------------Notification-----articleComments---------
+					await this.notificationService.createNotification(memberId, {
+						notificationType: NotificationType.COMMENT,
+						notificationGroup: NotificationGroup.ARTICLE,
+						notificationTitle: 'New Comment for your Article!',
+						notificationDesc: `${member.memberNick} commented your article! `,
+						authorId: memberId,
+						receiverId: article.memberId,
+						gadgetId: undefined,
+						articleId: input.commentRefId,
+					});
 				break;
 			case CommentGroup.MEMBER:
 				await this.memberService.memberStatsEditor({
@@ -57,10 +91,22 @@ export class CommentService {
 					targetKey: 'memberComments',
 					modifier: 1,
 				});
+				// 3-------------Notification------memberComments--------
+
+				await this.notificationService.createNotification(memberId, {
+					notificationType: NotificationType.COMMENT,
+					notificationGroup: NotificationGroup.MEMBER,
+					notificationTitle: 'New Comment for you',
+					notificationDesc: `${member.memberNick} Commented to you! `,
+					authorId: memberId,
+					receiverId: input.commentRefId,
+					gadgetId: undefined,
+					articleId: undefined,
+				});
 				break;
 		}
-		await this.createCommentNotification(input, result);
-		await this.memberService.memberStatsEditor({ _id: input.commentRefId, targetKey: 'notifications', modifier: 1 });
+		// await this.createCommentNotification(input, result);
+		// await this.memberService.memberStatsEditor({ _id: input.commentRefId, targetKey: 'notifications', modifier: 1 });
 		if (!result) throw new InternalServerErrorException(Message.CREATE_FAILED);
 		return result;
 	}

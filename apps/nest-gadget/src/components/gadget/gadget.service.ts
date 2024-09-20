@@ -16,17 +16,19 @@ import { lookupAuthMemberLiked, lookupMember, shapeIntoMongoObjectId } from '../
 import { LikeInput } from '../../libs/dto/like/like.input'
 import { LikeGroup } from '../../libs/enums/like.enum'
 import { LikeService } from '../like/like.service'
+import { NotificationGroup, NotificationType } from '../../libs/enums/notification.enum'
+import { Member } from '../../libs/dto/member/member'
 import { NotificationService } from '../notification/notification.service'
-import { NotificationInput } from '../../libs/dto/notification/notification.input'
-import { NotificationGroup } from '../../libs/enums/notification.enum'
 
 @Injectable()
 export class GadgetService {
 	constructor(
 		@InjectModel('Gadget') private readonly gadgetModel: Model<Gadget>,
+		@InjectModel('Member') private readonly memberModel: Model<Member>,
 		private viewService: ViewService,
 		private memberService: MemberService,
 		private likeService: LikeService,
+		private notificationService: NotificationService,
 	){}
 
 		public async createGadget(input: GadgetInput): Promise<Gadget> {
@@ -174,6 +176,7 @@ export class GadgetService {
 
 	public async likeTargetGadget(memberId: ObjectId, likeRefId: ObjectId): Promise<Gadget> {
 		//variable ochamiz va izlemiz id :refId sini memberStatus.Active bolish kk
+		const member = await this.memberModel.findById(memberId).exec()
 		const target = await this.gadgetModel.findOne({ _id: likeRefId, gadgetStatus: GadgetStatus.ACTIVE }).exec();
 		if (!target) throw new InternalServerErrorException(Message.NO_DATA_FOUND);
 
@@ -188,9 +191,20 @@ export class GadgetService {
 		//Togle
 		const modifier: number = await this.likeService.toggleLike(input);
 		const result = await this.propertyStatsEditor({ _id: likeRefId, targetKey: 'gadgetLikes', modifier: modifier });
-		// const noti:number = await this.notificationService.toggleNotification(input)
 
 		if (!result) throw new InternalServerErrorException(Message.SOMETHING_WENT_WRONG);
+		if (modifier > 0) {
+			// Assuming modifier > 0 means a like was added
+			await this.notificationService.createNotification(memberId, {
+				notificationType: NotificationType.LIKE,
+				notificationGroup: NotificationGroup.GADGET,
+				notificationTitle: 'New Like on your Gadget',
+				notificationDesc: `${member.memberNick} liked your Gadget!`,
+				authorId: memberId,
+				receiverId: target.memberId,
+				gadgetId: likeRefId,
+			});
+		}
 		return result;
 	}
 

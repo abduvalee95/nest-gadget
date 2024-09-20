@@ -10,13 +10,11 @@ import { LikeGroup } from '../../libs/enums/like.enum'
 import { T } from '../../libs/types/common'
 import { lookupFavorite } from '../../libs/config'
 import { NotificationService } from '../notification/notification.service'
-import { NotificationGroup, NotificationType } from '../../libs/enums/notification.enum'
 import { Member } from '../../libs/dto/member/member'
 
 @Injectable()
 export class LikeService {
  constructor(@InjectModel('Like') private readonly likeModel: Model<Like>,
-				private readonly notificationService: NotificationService,
 				@InjectModel('Member') private readonly memberModel: Model<Member>
 ) {}
 
@@ -31,45 +29,12 @@ export class LikeService {
 		} else {
 			try {
 				await this.likeModel.create(input); 
-				// bu natijada qoshib beradi
-				// notification hosil qilinadi  memberId, notificastionRefId,
-				await this.memberModel.findByIdAndUpdate(
-					input.likeRefId, {$inc:{
-						notifications: +1}}, {new: true})
-					//@ts-ignore
-					await this.notificationService.toggleNotification(input.memberId, {
-						memberId: input.memberId,
-						notificationRefId: input.likeRefId,
-						notificationType: NotificationType.LIKE, // Define your notification types
-						notificationGroup: NotificationGroup.MEMBER, // Assuming `likeGroup` is part of `input` or you have it elsewhere
-						authorId: input.memberId, // Assuming the liker is the author of the notification
-						receiverId: input.likeRefId, // Assuming the owner of the liked content is the receiver
-						notificationTitle: `Your content was ${exist ? 'unliked' : 'liked'}`,
-						notificationDesc: exist ? 'Someone unliked your content' : 'Someone liked your content',
-			})
 			} 
 			catch (error) {
 				console.log('Eror LikeTogleService', error.message);
 				throw new BadRequestException(Message.CREATE_FAILED);
 			}
 		}
-		/* try {
-			//@ts-ignore
-      await this.notificationService.toggleNotification(input.memberId, {
-        memberId: input.memberId,
-        notificationRefId: input.likeRefId,
-        notificationType: NotificationType.LIKE, // Define your notification types
-        notificationGroup: NotificationGroup.ARTICLE, // Assuming `likeGroup` is part of `input` or you have it elsewhere
-        authorId: input.memberId, // Assuming the liker is the author of the notification
-        receiverId: input.likeRefId, // Assuming the owner of the liked content is the receiver
-        notificationTitle: `Your content was ${exist ? 'unliked' : 'liked'}`,
-        notificationDesc: exist ? 'Someone unliked your content' : 'Someone liked your content',
-				
-      });
-    } catch (error) {
-      console.error('Error in LikeService - notificationService:', error.message);
-      throw new BadRequestException(Message.CREATE_FAILED);
-    } */
 		return modifier;
 	}
 

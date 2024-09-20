@@ -20,7 +20,6 @@ import MemberSchema from '../../schemas/Member.model'
 				schema: MemberSchema,
 			},
 		]),
-		NotificationModule,
 	],
 	providers: [LikeService],
 	exports: [LikeService],

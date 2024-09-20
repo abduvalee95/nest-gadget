@@ -15,15 +15,19 @@ import { Direction } from '../../libs/enums/member.enum'
 import { lookupAuthMemberLiked, lookupMember, shapeIntoMongoObjectId } from '../../libs/config'
 import { LikeService } from '../like/like.service'
 import { LikeInput } from '../../libs/dto/like/like.input'
-import { NotificationGroup } from '../../libs/enums/notification.enum'
+import { NotificationGroup, NotificationType } from '../../libs/enums/notification.enum'
+import { NotificationService } from '../notification/notification.service'
+import { Member } from '../../libs/dto/member/member'
 
 @Injectable()
 export class BoardArticleService {
 constructor(
 	@InjectModel('BoardArticle') private readonly boardArticleModel: Model<BoardArticle>,
+	@InjectModel('Member') private readonly memberModel:Model<Member>,
 	private viewService: ViewService,
 	private memberService: MemberService,
 	private likeService: LikeService,
+	private notificationService: NotificationService,
 ) {}
 
 
@@ -136,6 +140,7 @@ public async getBoardArticles(memberId: ObjectId, input: BoardArticlesInquiry): 
 
 	public async likeTargetBoardArticle(memberId: ObjectId, likeRefId: ObjectId): Promise<BoardArticle> {
 		//variable ochamiz va izlemiz id :refId sini memberStatus.Active bolish kk
+		const member = await this.memberModel.findById(memberId).exec()
 		const target:BoardArticle = await this.boardArticleModel
 			.findOne({ _id: likeRefId, articleStatus: BoardArticleStatus.ACTIVE })
 			.exec();
@@ -159,7 +164,19 @@ public async getBoardArticles(memberId: ObjectId, input: BoardArticlesInquiry): 
 		});
 
 		if (!result) throw new InternalServerErrorException(Message.SOMETHING_WENT_WRONG);
-		return result;
+		if (modifier > 0) {
+			// Assuming modifier > 0 means a like was added
+			await this.notificationService.createNotification(memberId, {
+				notificationType: NotificationType.LIKE,
+				notificationGroup: NotificationGroup.ARTICLE,
+				notificationTitle: 'New Like on your article!',
+				notificationDesc: `${member.memberNick} liked your Article!`,
+				authorId: memberId,
+				receiverId: target.memberId,
+				gadgetId: likeRefId,
+			});
+		}
+			return result;
 	}
 
 	
