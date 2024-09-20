@@ -6,6 +6,9 @@ import { Member, TotalCounter } from '../member/member'
 @ObjectType()
 export class Notice {
 
+	@Field(() => String)
+	_id: ObjectId;
+
 	@Field(() => NoticeCategory)
 	noticeCategory: NoticeCategory;
 

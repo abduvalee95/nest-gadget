@@ -1,13 +1,14 @@
 import { BadRequestException, Injectable, InternalServerErrorException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model, ObjectId } from 'mongoose';
+import { lookupMember } from '../../libs/config';
 import { Notice, Notices } from '../../libs/dto/cs/cs';
 import { CsInput, NoticesInquiry } from '../../libs/dto/cs/cs.input';
+import { NoticeUpdate } from '../../libs/dto/cs/cs.update';
 import { Message } from '../../libs/enums/common.enums';
 import { Direction } from '../../libs/enums/member.enum';
 import { NoticeStatus } from '../../libs/enums/notice.enum';
 import { T } from '../../libs/types/common';
-import { lookupMember } from '../../libs/config'
 
 @Injectable()
 export class CsService {
@@ -55,6 +56,16 @@ export class CsService {
 		if (!result.length) throw new InternalServerErrorException(Message.NO_DATA_FOUND);
 		console.log('result', result);
 		return result[0];
+	}
+	public async updateNoticeByAdmin(input: NoticeUpdate): Promise<Notice> {
+		const { _id, noticeStatus } = input;
+
+		const result = await this.csModel
+			.findOneAndUpdate({ _id: _id, noticeStatus: NoticeStatus.ACTIVE }, input, { new: true })
+			.exec();
+		if (!result) throw new InternalServerErrorException(Message.UPDATE_FALED);
+
+		return result;
 	}
 
 	public async removeNotice(noticeId: ObjectId): Promise<Notice> {

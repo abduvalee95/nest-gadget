@@ -1,7 +1,7 @@
 import { Field, InputType } from '@nestjs/graphql'
 import { IsNotEmpty, IsOptional, Length } from 'class-validator'
 import { ObjectId } from 'mongoose'
-import { NoticeStatus } from '../../enums/notice.enum'
+import { NoticeCategory, NoticeStatus } from '../../enums/notice.enum'
 
 @InputType()
 export class NoticeUpdate {
@@ -9,6 +9,10 @@ export class NoticeUpdate {
 	@Field(() => String)
 	_id: ObjectId;
 
+	@IsOptional()
+	@Field(() => NoticeCategory, { nullable: true })
+	noticeCategory?: NoticeCategory;
+	
 	@IsOptional()
 	@Field(() => NoticeStatus, { nullable: true })
 	noticeStatus?: NoticeStatus;
@@ -22,4 +26,16 @@ export class NoticeUpdate {
 	@Length(1, 100)
 	@Field(() => String, { nullable: true })
 	noticeContent?: string;
+	
+	@IsOptional()
+	@Field(() => String, { nullable: true })
+	memberId?: ObjectId;
+
+	@IsOptional()
+	@Field(() => Date, { nullable: true })
+	createdAt?: Date;
+
+	@IsOptional()
+	@Field(() => Date, { nullable: true })
+	updatedAt?: Date;
 }

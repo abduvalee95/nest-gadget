@@ -22,6 +22,7 @@ export class CsInput {
 	noticeContent: string;
 
 	memberId?: ObjectId;
+	_id?: String;
 
 }
 @InputType()
